@@ -1,7 +1,7 @@
 services:
   mysql:
     image: 'mysql:latest'
-    container_name: mysql_db
+    container_name: giarts_db
     environment:
       - 'MYSQL_DATABASE=giartsdatabase'
       - 'MYSQL_PASSWORD=secret'
