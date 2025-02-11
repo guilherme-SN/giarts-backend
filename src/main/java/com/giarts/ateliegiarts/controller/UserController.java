@@ -6,23 +6,20 @@ import java.util.List;
 import jakarta.validation.Valid;
 
 import com.giarts.ateliegiarts.dto.UserDTO;
-import com.giarts.ateliegiarts.exception.UserNotFoundException;
 import com.giarts.ateliegiarts.model.User;
 import com.giarts.ateliegiarts.service.UserService;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -46,13 +43,9 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "User retrieved successfully")
     @ApiResponse(responseCode = "404", description = "User not found")
     @GetMapping("/{userId}")
-    public ResponseEntity<?> getUserById(@PathVariable("userId") Long userId) {
-        try {
-            User user = userService.getUserById(userId);
-            return ResponseEntity.ok(user);
-        } catch (UserNotFoundException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        }
+    public ResponseEntity<User> getUserById(@PathVariable("userId") Long userId) {
+        User user = userService.getUserById(userId);
+        return ResponseEntity.ok(user);
     }
 
 
@@ -60,11 +53,8 @@ public class UserController {
     @ApiResponse(responseCode = "201", description = "User created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid user input")
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody @Valid UserDTO userDTO, BindingResult result) {
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().build();
-        }
-
+    public ResponseEntity<User> createUser(@RequestBody @Valid UserDTO userDTO) {
+        System.out.println("User DTO: " + userDTO.toString());
         User createdUser = userService.createUser(userDTO);
 
         URI location = URI.create("/api/users/" + createdUser.getId().toString());
@@ -77,21 +67,9 @@ public class UserController {
     @ApiResponse(responseCode = "400", description = "Invalid user input")
     @ApiResponse(responseCode = "404", description = "User not found")
     @PutMapping("/{userId}")
-    public ResponseEntity<?> updateUserById(
-            @PathVariable("userId") Long userId, 
-            @RequestBody @Valid UserDTO updatedUserDTO, 
-            BindingResult result) {
-
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        try {
-            User updatedUser = userService.updateUserById(userId, updatedUserDTO);
-            return ResponseEntity.ok(updatedUser);
-        } catch (UserNotFoundException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        }
+    public ResponseEntity<User> updateUserById(@PathVariable("userId") Long userId, @RequestBody @Valid UserDTO updatedUserDTO) {
+        User updatedUser = userService.updateUserById(userId, updatedUserDTO);
+        return ResponseEntity.ok(updatedUser);
     }
 
 
@@ -99,12 +77,8 @@ public class UserController {
     @ApiResponse(responseCode = "204", description = "User deleted successfully")
     @ApiResponse(responseCode = "404", description = "User not found")
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteUserById(@PathVariable("userId") Long userId) {
-        try {
-            userService.deleteUserById(userId);
-            return ResponseEntity.noContent().build();
-        } catch (UserNotFoundException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        }
+    public ResponseEntity<User> deleteUserById(@PathVariable("userId") Long userId) {
+        userService.deleteUserById(userId);
+        return ResponseEntity.noContent().build();
     }
 }
