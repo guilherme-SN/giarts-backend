@@ -3,6 +3,7 @@ package com.giarts.ateliegiarts.service;
 import java.util.List;
 
 import com.giarts.ateliegiarts.dto.UserDTO;
+import com.giarts.ateliegiarts.exception.DuplicateEmailException;
 import com.giarts.ateliegiarts.exception.UserNotFoundException;
 import com.giarts.ateliegiarts.model.User;
 import com.giarts.ateliegiarts.repository.UserRepository;
@@ -26,6 +27,10 @@ public class UserService {
     }
 
     public User createUser(UserDTO userDTO) {
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
+            throw new DuplicateEmailException(userDTO.getEmail());
+        }
+
         User user = new User(userDTO);
         return userRepository.save(user);
     }
