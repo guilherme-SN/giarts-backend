@@ -1,7 +1,9 @@
 package com.giarts.ateliegiarts.exception;
 
 
-public class UserNotFoundException extends RuntimeException {
+import jakarta.persistence.EntityNotFoundException;
+
+public class UserNotFoundException extends EntityNotFoundException {
     public UserNotFoundException(Long userId) {
         super("User not found with id: " + userId.toString());
     }
