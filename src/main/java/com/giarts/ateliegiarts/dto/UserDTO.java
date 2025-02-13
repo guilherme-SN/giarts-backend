@@ -20,15 +20,14 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
-    @NotNull(message = "Name is required")
-    @NotBlank(message = "Name must not be blank")
+    @NotBlank(message = "Name is required")
     private String name;
 
-    @NotNull(message = "Email is required")
+    @NotBlank(message = "Email is required")
     @Email(message = "Email must be valid")
     private String email;
 
-    @NotNull(message = "Password is required")
+    @NotBlank(message = "Password is required")
     private String password;
 
     @NotNull(message = "UserRole is required")

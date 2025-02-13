@@ -38,7 +38,6 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-
     @Operation(summary = "Get an user by ID")
     @ApiResponse(responseCode = "200", description = "User retrieved successfully")
     @ApiResponse(responseCode = "404", description = "User not found")
@@ -48,19 +47,16 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-
     @Operation(summary = "Create an user")
     @ApiResponse(responseCode = "201", description = "User created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid user input")
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody @Valid UserDTO userDTO) {
-        System.out.println("User DTO: " + userDTO.toString());
         User createdUser = userService.createUser(userDTO);
 
         URI location = URI.create("/api/users/" + createdUser.getId().toString());
         return ResponseEntity.created(location).body(createdUser);
     }
-
 
     @Operation(summary = "Update an user")
     @ApiResponse(responseCode = "200", description = "User updated successfully")
@@ -72,12 +68,11 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
     }
 
-
     @Operation(summary = "Delete an user")
     @ApiResponse(responseCode = "204", description = "User deleted successfully")
     @ApiResponse(responseCode = "404", description = "User not found")
     @DeleteMapping("/{userId}")
-    public ResponseEntity<User> deleteUserById(@PathVariable("userId") Long userId) {
+    public ResponseEntity<Void> deleteUserById(@PathVariable("userId") Long userId) {
         userService.deleteUserById(userId);
         return ResponseEntity.noContent().build();
     }
