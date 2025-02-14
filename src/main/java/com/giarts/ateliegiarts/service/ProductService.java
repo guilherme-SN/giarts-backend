@@ -1,13 +1,15 @@
 package com.giarts.ateliegiarts.service;
 
+import java.util.List;
+
 import com.giarts.ateliegiarts.dto.ProductDTO;
 import com.giarts.ateliegiarts.exception.ProductNotFoundException;
 import com.giarts.ateliegiarts.model.Product;
 import com.giarts.ateliegiarts.repository.ProductRepository;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

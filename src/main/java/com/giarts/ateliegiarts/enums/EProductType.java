@@ -1,5 +1,6 @@
 package com.giarts.ateliegiarts.enums;
 
+
 public enum EProductType {
     BOLSA("Bolsa"),
     TAPETE("Tapete"),

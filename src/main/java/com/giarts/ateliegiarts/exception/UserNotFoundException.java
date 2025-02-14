@@ -1,6 +1,5 @@
 package com.giarts.ateliegiarts.exception;
 
-
 import jakarta.persistence.EntityNotFoundException;
 
 public class UserNotFoundException extends EntityNotFoundException {
