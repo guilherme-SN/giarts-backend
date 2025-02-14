@@ -1,16 +1,14 @@
 package com.giarts.ateliegiarts.service;
 
-import java.util.List;
-
 import com.giarts.ateliegiarts.dto.UserDTO;
 import com.giarts.ateliegiarts.exception.DuplicateEmailException;
 import com.giarts.ateliegiarts.exception.UserNotFoundException;
 import com.giarts.ateliegiarts.model.User;
 import com.giarts.ateliegiarts.repository.UserRepository;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor

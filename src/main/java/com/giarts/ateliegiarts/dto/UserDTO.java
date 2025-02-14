@@ -1,17 +1,10 @@
 package com.giarts.ateliegiarts.dto;
 
+import com.giarts.ateliegiarts.enums.EUserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
-import com.giarts.ateliegiarts.enums.EUserRole;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Setter
