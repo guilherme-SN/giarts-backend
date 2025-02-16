@@ -1,8 +1,9 @@
 package com.giarts.ateliegiarts.service;
 
-import com.giarts.ateliegiarts.exception.ProductNotFoundException;
+import com.giarts.ateliegiarts.exception.ImageStoreException;
+import com.giarts.ateliegiarts.model.Product;
+import com.giarts.ateliegiarts.model.ProductImage;
 import com.giarts.ateliegiarts.repository.ProductImageRepository;
-import com.giarts.ateliegiarts.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,10 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -27,50 +26,70 @@ public class ProductImageService {
     @Value("${server.url}")
     private String serverUrl;
 
+    private final ProductService productService;
     private final ProductImageRepository productImageRepository;
-    private final ProductRepository productRepository;
 
-    public List<String> getAllProducts(Long productId) {
-        this.validateProduct(productId);
+    public List<ProductImage> getAllProductImages(Long productId) {
+        productService.validateProduct(productId);
 
-        Path uploadDirectory = Paths.get(uploadLocation, productId.toString());
-
-        if (!Files.exists(uploadDirectory)) {
-            return Collections.emptyList();
-        }
-
-        try (Stream<Path> stream = Files.list(uploadDirectory)) {
-            return stream
-                    .map(Path::getFileName)
-                    .map(Path::toString)
-                    .map(fileName -> serverUrl + "/api/products/" + productId.toString() + "/images/" + fileName)
-                    .toList();
-        } catch (IOException ex) {
-            throw new RuntimeException("Error while trying to get all images from product with id: " + productId.toString(), ex);
-        }
+        return productImageRepository.findAllByProductId(productId);
     }
 
-    public String uploadImage(Long productId, MultipartFile file) {
-        this.validateProduct(productId);
-
-        Path uploadDirectory = Paths.get(uploadLocation, productId.toString());
+    public ProductImage saveUploadedImage(Long productId, MultipartFile file, boolean isMainImage) {
+        productService.validateProduct(productId);
 
         try {
-            Files.createDirectories(uploadDirectory);
+            this.storeFileInProductFolder(productId, file);
 
-            Path filePath = uploadDirectory.resolve(Objects.requireNonNull(file.getOriginalFilename()));
+            String imageUrl = generateImageUrl(productId, file.getOriginalFilename());
 
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            return serverUrl + "/api/products/" + productId.toString() + "/images/" + file.getOriginalFilename();
+            ProductImage productImage = buildProductImage(productService.getProductById(productId), file, imageUrl, isMainImage);
+            return productImageRepository.save(productImage);
         } catch (IOException ex) {
-            throw new RuntimeException("Error while trying to save image", ex);
+            throw new ImageStoreException("Failed to store image for product with id: " + productId, ex);
         }
     }
 
-    private void validateProduct(Long productId) {
-        if (!productRepository.existsById(productId)) {
-            throw new ProductNotFoundException(productId);
+    private void storeFileInProductFolder(Long productId, MultipartFile file) throws IOException {
+        Path uploadDirectory = Paths.get(uploadLocation, productId.toString());
+        Files.createDirectories(uploadDirectory);
+
+        Path fileLocation = uploadDirectory.resolve(Objects.requireNonNull(file.getOriginalFilename()));
+        Files.copy(file.getInputStream(), fileLocation, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    private String generateImageUrl(Long productId, String fileName) {
+        return String.format("%s/api/products/%d/images/%s", serverUrl, productId, fileName);
+    }
+
+    private ProductImage buildProductImage(Product product, MultipartFile file, String imageUrl, boolean isMainImage) {
+        return ProductImage.builder()
+                .product(product)
+                .imageUrl(imageUrl)
+                .isMainImage(isMainImage)
+                .fileName(file.getOriginalFilename())
+                .fileSize(file.getSize())
+                .fileType(file.getContentType())
+                .build();
+    }
+
+    public void deleteProductImage(Long productId, Long imageId) {
+        productService.validateProduct(productId);
+
+        ProductImage productImage = productImageRepository.findById(imageId)
+                .orElseThrow(() -> new ImageStoreException("Image with id " + imageId + " does not exists"));
+
+        productImageRepository.deleteById(imageId);
+        this.deleteImageFromStorage(productId, productImage.getFileName());
+    }
+
+    private void deleteImageFromStorage(Long productId, String fileName) {
+        Path imagePath = Paths.get(uploadLocation, productId.toString(), fileName);
+
+        try {
+            Files.deleteIfExists(imagePath);
+        } catch (IOException ex) {
+            throw new ImageStoreException("Failed to delete image from storage: " + fileName, ex);
         }
     }
 }

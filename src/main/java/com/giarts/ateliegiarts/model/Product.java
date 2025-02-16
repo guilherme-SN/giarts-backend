@@ -1,28 +1,18 @@
 package com.giarts.ateliegiarts.model;
 
-import java.time.LocalDateTime;
-import java.util.Set;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.giarts.ateliegiarts.dto.ProductDTO;
 import com.giarts.ateliegiarts.enums.EProductType;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 @Builder
@@ -43,8 +33,9 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private EProductType productType;
 
-    @OneToMany(mappedBy = "product")
-    private Set<ProductImage> productImagesUrl;
+    @JsonIgnore
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ProductImage> productImages;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

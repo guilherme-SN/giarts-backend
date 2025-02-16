@@ -1,15 +1,13 @@
 package com.giarts.ateliegiarts.service;
 
-import java.util.List;
-
 import com.giarts.ateliegiarts.dto.ProductDTO;
 import com.giarts.ateliegiarts.exception.ProductNotFoundException;
 import com.giarts.ateliegiarts.model.Product;
 import com.giarts.ateliegiarts.repository.ProductRepository;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +48,12 @@ public class ProductService {
         if (productRepository.existsById(productId)) {
             productRepository.deleteById(productId);
         } else {
+            throw new ProductNotFoundException(productId);
+        }
+    }
+
+    public void validateProduct(Long productId) {
+        if (!productRepository.existsById(productId)) {
             throw new ProductNotFoundException(productId);
         }
     }

@@ -1,6 +1,6 @@
 package com.giarts.ateliegiarts.controller;
 
-import com.giarts.ateliegiarts.dto.ImageUploadResponse;
+import com.giarts.ateliegiarts.model.ProductImage;
 import com.giarts.ateliegiarts.service.ProductImageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,23 +23,27 @@ public class ProductImageController {
     @ApiResponse(responseCode = "200", description = "Images retrieved successfully")
     @ApiResponse(responseCode = "404", description = "Product not found")
     @GetMapping
-    public ResponseEntity<List<String>> getAllProductImages(@PathVariable("productId") Long productId) {
-        return ResponseEntity.ok(productImageService.getAllProducts(productId));
+    public ResponseEntity<List<ProductImage>> getAllProductImages(@PathVariable("productId") Long productId) {
+        return ResponseEntity.ok(productImageService.getAllProductImages(productId));
     }
 
     @Operation(summary = "Upload an image to a product")
     @ApiResponse(responseCode = "200", description = "Image uploaded successfully")
     @ApiResponse(responseCode = "404", description = "Product not found")
     @PostMapping
-    public ResponseEntity<ImageUploadResponse> uploadImage(@PathVariable("productId") Long productId,
-                                                           @RequestParam("file") MultipartFile file) {
-        String imageUrl = productImageService.uploadImage(productId, file);
+    public ResponseEntity<ProductImage> uploadImage(@PathVariable("productId") Long productId,
+                                                    @RequestParam("file") MultipartFile file,
+                                                    @RequestParam(value = "isMainImage", defaultValue = "false") Boolean isMainImage) {
+        return ResponseEntity.ok(productImageService.saveUploadedImage(productId, file, isMainImage));
+    }
 
-        return ResponseEntity.ok(new ImageUploadResponse(
-                imageUrl,
-                file.getOriginalFilename(),
-                file.getSize(),
-                file.getContentType()
-        ));
+    @Operation(summary = "Delete an image")
+    @ApiResponse(responseCode = "204", description = "Image deleted successfully")
+    @ApiResponse(responseCode = "404", description = "Product or Image not found")
+    @DeleteMapping("/{imageId}")
+    public ResponseEntity<Void> deleteProductImageById(@PathVariable("productId") Long productId,
+                                                       @PathVariable("imageId") Long imageId) {
+        productImageService.deleteProductImage(productId, imageId);
+        return ResponseEntity.noContent().build();
     }
 }
