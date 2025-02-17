@@ -168,6 +168,33 @@ public class ProductServiceTest {
         }
     }
 
+    @Nested
+    class validateProduct {
+        @Test
+        @DisplayName("Should not throw exception when product is valid")
+        void ShouldNotThrowExceptionWhenProductIsValid() {
+            Long productId = 1L;
+
+            when(productRepository.existsById(productId)).thenReturn(true);
+
+            assertDoesNotThrow(() -> productService.validateProduct(productId));
+
+            verify(productRepository, times(1)).existsById(productId);
+        }
+
+        @Test
+        @DisplayName("Should throw ProductNotFoundException when product is valid")
+        void ShouldThrowExceptionWhenProductIsValid() {
+            Long productId = 1L;
+
+            when(productRepository.existsById(productId)).thenReturn(false);
+
+            assertThrows(ProductNotFoundException.class, () -> productService.validateProduct(productId));
+
+            verify(productRepository, times(1)).existsById(productId);
+        }
+    }
+
     private Product createProduct(Long id, String name, String description, EProductType productType) {
         return Product.builder()
                 .id(id)
