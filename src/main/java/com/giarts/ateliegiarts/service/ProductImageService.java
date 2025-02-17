@@ -13,9 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +25,7 @@ public class ProductImageService {
     private String serverUrl;
 
     private final ProductService productService;
+    private final FileStorageService fileStorageService;
     private final ProductImageRepository productImageRepository;
 
     public List<ProductImage> getAllProductImages(Long productId) {
@@ -39,7 +38,7 @@ public class ProductImageService {
         productService.validateProduct(productId);
 
         try {
-            this.storeFileInProductFolder(productId, file);
+            fileStorageService.storeFileInProductFolder(productId, file);
 
             String imageUrl = generateImageUrl(productId, file.getOriginalFilename());
 
@@ -48,14 +47,6 @@ public class ProductImageService {
         } catch (IOException ex) {
             throw new ImageStoreException("Failed to store image for product with id: " + productId, ex);
         }
-    }
-
-    private void storeFileInProductFolder(Long productId, MultipartFile file) throws IOException {
-        Path uploadDirectory = Paths.get(uploadLocation, productId.toString());
-        Files.createDirectories(uploadDirectory);
-
-        Path fileLocation = uploadDirectory.resolve(Objects.requireNonNull(file.getOriginalFilename()));
-        Files.copy(file.getInputStream(), fileLocation, StandardCopyOption.REPLACE_EXISTING);
     }
 
     private String generateImageUrl(Long productId, String fileName) {
