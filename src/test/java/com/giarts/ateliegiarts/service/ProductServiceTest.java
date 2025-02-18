@@ -164,7 +164,7 @@ public class ProductServiceTest {
             assertThrows(ProductNotFoundException.class, () -> productService.deleteProductById(productId));
 
             verify(productRepository, times(1)).existsById(productId);
-            verify(productRepository, times(0)).deleteById(productId);
+            verify(productRepository, never()).deleteById(productId);
         }
     }
 

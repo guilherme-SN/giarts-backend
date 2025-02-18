@@ -1,27 +1,11 @@
 package com.giarts.ateliegiarts.service;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.Optional;
-
 import com.giarts.ateliegiarts.dto.UserDTO;
 import com.giarts.ateliegiarts.enums.EUserRole;
 import com.giarts.ateliegiarts.exception.DuplicateEmailException;
 import com.giarts.ateliegiarts.exception.UserNotFoundException;
 import com.giarts.ateliegiarts.model.User;
 import com.giarts.ateliegiarts.repository.UserRepository;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,6 +15,13 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -183,7 +174,7 @@ public class UserServiceTest {
             assertThrows(UserNotFoundException.class, () -> userService.deleteUserById(anyLong()));
 
             verify(userRepository, times(1)).existsById(anyLong());
-            verify(userRepository, times(0)).deleteById(anyLong());
+            verify(userRepository, never()).deleteById(anyLong());
         }
     }
 

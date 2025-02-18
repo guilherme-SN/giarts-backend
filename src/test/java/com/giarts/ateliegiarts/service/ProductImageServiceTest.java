@@ -162,6 +162,9 @@ public class ProductImageServiceTest {
             when(productImageRepository.findById(imageId)).thenReturn(Optional.empty());
 
             assertThrows(ImageStoreException.class, () -> productImageService.deleteProductImage(productId, imageId));
+
+            verify(fileStorageService, never()).deleteImageFromStorage(anyLong(), anyString());
+            verify(productImageRepository, never()).deleteById(anyLong());
         }
     }
 
