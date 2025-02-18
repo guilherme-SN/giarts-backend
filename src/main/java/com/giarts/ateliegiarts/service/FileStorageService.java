@@ -1,5 +1,6 @@
 package com.giarts.ateliegiarts.service;
 
+import com.giarts.ateliegiarts.exception.ImageStoreException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,5 +25,15 @@ public class FileStorageService {
 
         Path fileLocation = uploadDirectory.resolve(Objects.requireNonNull(file.getOriginalFilename()));
         Files.copy(file.getInputStream(), fileLocation, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    public void deleteImageFromStorage(Long productId, String fileName) {
+        Path imagePath = Paths.get(uploadLocation, productId.toString(), fileName);
+
+        try {
+            Files.deleteIfExists(imagePath);
+        } catch (IOException ex) {
+            throw new ImageStoreException("Failed to delete image from storage: " + fileName, ex);
+        }
     }
 }

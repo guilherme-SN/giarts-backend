@@ -10,9 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 @Service
@@ -70,17 +67,7 @@ public class ProductImageService {
         ProductImage productImage = productImageRepository.findById(imageId)
                 .orElseThrow(() -> new ImageStoreException("Image with id " + imageId + " does not exists"));
 
+        fileStorageService.deleteImageFromStorage(productId, productImage.getFileName());
         productImageRepository.deleteById(imageId);
-        this.deleteImageFromStorage(productId, productImage.getFileName());
-    }
-
-    private void deleteImageFromStorage(Long productId, String fileName) {
-        Path imagePath = Paths.get(uploadLocation, productId.toString(), fileName);
-
-        try {
-            Files.deleteIfExists(imagePath);
-        } catch (IOException ex) {
-            throw new ImageStoreException("Failed to delete image from storage: " + fileName, ex);
-        }
     }
 }

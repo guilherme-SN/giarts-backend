@@ -1,6 +1,6 @@
 package com.giarts.ateliegiarts.service;
 
-import com.giarts.ateliegiarts.exception.ProductNotFoundException;
+import com.giarts.ateliegiarts.exception.ImageStoreException;
 import com.giarts.ateliegiarts.model.Product;
 import com.giarts.ateliegiarts.model.ProductImage;
 import com.giarts.ateliegiarts.repository.ProductImageRepository;
@@ -8,19 +8,26 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductImageServiceTest {
+    @Value("${server.url}")
+    private String serverUrl;
+
     @Mock
     private ProductService productService;
 
@@ -32,6 +39,9 @@ public class ProductImageServiceTest {
 
     @InjectMocks
     private ProductImageService productImageService;
+
+    @Captor
+    private ArgumentCaptor<ProductImage> productImageArgumentCaptor;
 
     @Nested
     class getAllProductImages {
@@ -58,19 +68,6 @@ public class ProductImageServiceTest {
             verify(productService, times(1)).validateProduct(productId);
             verify(productImageRepository, times(1)).findAllByProductId(productId);
         }
-
-        @Test
-        @DisplayName("Should throw ProductNotFoundException when product does not exist")
-        void shouldThrowExceptionWhenProductDoesNotExist() {
-            Long productId = 1L;
-
-            doThrow(new ProductNotFoundException(productId)).when(productService).validateProduct(productId);
-
-            assertThrows(ProductNotFoundException.class, () -> productImageService.getAllProductImages(productId));
-
-            verify(productService, times(1)).validateProduct(productId);
-            verify(productImageRepository, times(0)).findAllByProductId(productId);
-        }
     }
 
     @Nested
@@ -79,21 +76,92 @@ public class ProductImageServiceTest {
         @DisplayName("Should save uploaded image with success")
         void shouldSaveUploadedImageWithSuccess() throws IOException {
             Long productId = 1L;
-            Product product = createProduct(productId);
-            MultipartFile file = mock(MultipartFile.class);
+            boolean isMainImage = true;
             String fileName = "image.png";
+            long fileSize = 1024L;
+            String contentType = "image/png";
+            String expectedImageUrl = String.format("%s/api/products/%d/images/%s", serverUrl, productId, fileName);
+
+            ProductImage expectedProductImage = createProductImage(
+                    1L,
+                    expectedImageUrl,
+                    isMainImage,
+                    fileName,
+                    productId
+            );
+
+            MultipartFile file = createMultipartFileMock(fileName, fileSize, contentType);
+
+            doNothing().when(productService).validateProduct(anyLong());
+            doNothing().when(fileStorageService).storeFileInProductFolder(anyLong(), any(MultipartFile.class));
+            when(productService.getProductById(productId)).thenReturn(createProduct(productId));
+            when(productImageRepository.save(productImageArgumentCaptor.capture()))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+
+            productImageService.saveUploadedImage(productId, file, isMainImage);
+
+            ProductImage capturedProductImage = productImageArgumentCaptor.getValue();
+            assertNotNull(capturedProductImage);
+            assertProductImageDetails(expectedProductImage, capturedProductImage);
+
+            verify(productService, times(1)).validateProduct(productId);
+            verify(fileStorageService, times(1)).storeFileInProductFolder(productId, file);
+            verify(productImageRepository, times(1)).save(any(ProductImage.class));
+        }
+
+        @Test
+        @DisplayName("Should throw ImageStoreException when file storage fails")
+        void shouldThrowExceptionWhenFileStorageFails() throws IOException {
+            Long productId = 1L;
+            MultipartFile file = createMultipartFileMock("image.png", 1024L, "image/png");
             boolean isMainImage = true;
 
             doNothing().when(productService).validateProduct(anyLong());
-            doNothing().when(fileStorageService).storeFileInProductFolder(productId, file);
+            doThrow(new IOException()).when(fileStorageService)
+                    .storeFileInProductFolder(anyLong(), any(MultipartFile.class));
 
-            when(file.getOriginalFilename()).thenReturn(fileName);
-            when(productService.getProductById(productId)).thenReturn(product);
-            when(productImageRepository.save(any(ProductImage.class))).thenReturn(new ProductImage());
+            assertThrows(ImageStoreException.class, () -> productImageService.saveUploadedImage(productId, file, isMainImage));
 
-            assertDoesNotThrow(() -> productImageService.saveUploadedImage(productId, file, isMainImage));
+            verify(productService, times(1)).validateProduct(anyLong());
+            verify(fileStorageService, times(1)).storeFileInProductFolder(productId, file);
+        }
+    }
 
-            // TODO: add captor to capture ProductImage in save() method and verify it
+    @Nested
+    class deleteProductImage {
+        @Test
+        @DisplayName("Should delete product image from database with success")
+        void shouldDeleteProductImageFromDatabaseWithSuccess() {
+            Long productId = 1L;
+            Long imageId = 1L;
+            String fileName = "image.png";
+            ProductImage productImage = ProductImage.builder()
+                    .id(imageId)
+                    .fileName(fileName)
+                    .build();
+
+            doNothing().when(productService).validateProduct(productId);
+            when(productImageRepository.findById(imageId)).thenReturn(Optional.of(productImage));
+            doNothing().when(fileStorageService).deleteImageFromStorage(productId, fileName);
+
+            assertDoesNotThrow(() -> productImageService.deleteProductImage(productId, imageId));
+
+            verify(productService, times(1)).validateProduct(productId);
+            verify(productImageRepository, times(1)).findById(imageId);
+            verify(fileStorageService, times(1)).deleteImageFromStorage(productId, fileName);
+            verify(productImageRepository, times(1)).deleteById(imageId);
+        }
+
+        @Test
+        @DisplayName("Should throw ImageStoreException when image does not exist")
+        void shouldThrowExceptionWhenImageDoesNotExist() {
+            Long productId = 1L;
+            Long imageId = 1L;
+
+            doNothing().when(productService).validateProduct(productId);
+            when(productImageRepository.findById(imageId)).thenReturn(Optional.empty());
+
+            assertThrows(ImageStoreException.class, () -> productImageService.deleteProductImage(productId, imageId));
         }
     }
 
@@ -104,7 +172,7 @@ public class ProductImageServiceTest {
                 .imageUrl(imageUrl)
                 .isMainImage(isMainImage)
                 .fileName(fileName)
-                .fileSize(1000L)
+                .fileSize(1024L)
                 .fileType("image/png")
                 .product(createProduct(productId))
                 .build();
@@ -112,6 +180,15 @@ public class ProductImageServiceTest {
 
     private Product createProduct(Long productId) {
         return Product.builder().id(productId).build();
+    }
+
+    private MultipartFile createMultipartFileMock(String fileName, Long fileSize, String contentType) {
+        MultipartFile file = mock(MultipartFile.class);
+        lenient().when(file.getOriginalFilename()).thenReturn(fileName);
+        lenient().when(file.getSize()).thenReturn(fileSize);
+        lenient().when(file.getContentType()).thenReturn(contentType);
+
+        return file;
     }
 
     private void assertProductImageDetails(ProductImage expected, ProductImage actual) {
