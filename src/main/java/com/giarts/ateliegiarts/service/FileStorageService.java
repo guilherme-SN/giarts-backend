@@ -19,12 +19,16 @@ public class FileStorageService {
     @Value("${storage.location}")
     private String uploadLocation;
 
-    public void storeFileInProductFolder(Long productId, MultipartFile file) throws IOException {
-        Path uploadDirectory = Paths.get(uploadLocation, productId.toString());
-        Files.createDirectories(uploadDirectory);
+    public void storeFileInProductFolder(Long productId, MultipartFile file) {
+        try {
+            Path uploadDirectory = Paths.get(uploadLocation, productId.toString());
+            Files.createDirectories(uploadDirectory);
 
-        Path fileLocation = uploadDirectory.resolve(Objects.requireNonNull(file.getOriginalFilename()));
-        Files.copy(file.getInputStream(), fileLocation, StandardCopyOption.REPLACE_EXISTING);
+            Path fileLocation = uploadDirectory.resolve(Objects.requireNonNull(file.getOriginalFilename()));
+            Files.copy(file.getInputStream(), fileLocation, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException ex) {
+            throw new ImageStoreException("Failed to store image for product with id: " + productId, ex);
+        }
     }
 
     public void deleteImageFromStorage(Long productId, String fileName) {

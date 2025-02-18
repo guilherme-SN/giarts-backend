@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -34,16 +33,12 @@ public class ProductImageService {
     public ProductImage saveUploadedImage(Long productId, MultipartFile file, boolean isMainImage) {
         productService.validateProduct(productId);
 
-        try {
-            fileStorageService.storeFileInProductFolder(productId, file);
+        fileStorageService.storeFileInProductFolder(productId, file);
 
-            String imageUrl = generateImageUrl(productId, file.getOriginalFilename());
+        String imageUrl = generateImageUrl(productId, file.getOriginalFilename());
 
-            ProductImage productImage = buildProductImage(productService.getProductById(productId), file, imageUrl, isMainImage);
-            return productImageRepository.save(productImage);
-        } catch (IOException ex) {
-            throw new ImageStoreException("Failed to store image for product with id: " + productId, ex);
-        }
+        ProductImage productImage = buildProductImage(productService.getProductById(productId), file, imageUrl, isMainImage);
+        return productImageRepository.save(productImage);
     }
 
     private String generateImageUrl(Long productId, String fileName) {

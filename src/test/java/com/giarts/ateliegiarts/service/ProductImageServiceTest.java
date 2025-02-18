@@ -117,8 +117,8 @@ public class ProductImageServiceTest {
             boolean isMainImage = true;
 
             doNothing().when(productService).validateProduct(anyLong());
-            doThrow(new IOException()).when(fileStorageService)
-                    .storeFileInProductFolder(anyLong(), any(MultipartFile.class));
+            doThrow(new ImageStoreException("Failed to store image for product with id: " + productId))
+                    .when(fileStorageService).storeFileInProductFolder(anyLong(), any(MultipartFile.class));
 
             assertThrows(ImageStoreException.class, () -> productImageService.saveUploadedImage(productId, file, isMainImage));
 
