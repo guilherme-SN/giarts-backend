@@ -43,7 +43,7 @@ public class FileStorageServiceIntegrationTest {
 
         fileStorageService.storeFileInProductFolder(productId, file);
 
-        Path storedFilePath = temporaryDirectory.resolve(productId.toString() + "/" + fileName);
+        Path storedFilePath = temporaryDirectory.resolve("products/" + productId.toString() + "/" + fileName);
         assertTrue(Files.exists(storedFilePath));
     }
 
@@ -57,7 +57,7 @@ public class FileStorageServiceIntegrationTest {
 
         fileStorageService.storeFileInProductFolder(productId, file);
 
-        Path storedFilePath = temporaryDirectory.resolve(productId.toString() + "/" + fileName);
+        Path storedFilePath = temporaryDirectory.resolve("products/" + productId.toString() + "/" + fileName);
         assertTrue(Files.exists(storedFilePath));
 
         fileStorageService.deleteImageFromStorage(productId, fileName);

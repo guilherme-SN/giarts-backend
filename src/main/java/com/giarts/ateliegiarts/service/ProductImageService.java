@@ -42,7 +42,7 @@ public class ProductImageService {
     }
 
     private String generateImageUrl(Long productId, String fileName) {
-        return String.format("%s/api/products/%d/images/%s", serverUrl, productId, fileName);
+        return String.format("%s/products/%d/images/%s", serverUrl, productId, fileName);
     }
 
     private ProductImage buildProductImage(Product product, MultipartFile file, String imageUrl, boolean isMainImage) {

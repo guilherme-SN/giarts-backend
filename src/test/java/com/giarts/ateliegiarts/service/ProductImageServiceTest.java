@@ -80,7 +80,7 @@ public class ProductImageServiceTest {
             String fileName = "image.png";
             long fileSize = 1024L;
             String contentType = "image/png";
-            String expectedImageUrl = String.format("%s/api/products/%d/images/%s", serverUrl, productId, fileName);
+            String expectedImageUrl = String.format("%s/products/%d/images/%s", serverUrl, productId, fileName);
 
             ProductImage expectedProductImage = createProductImage(
                     1L,

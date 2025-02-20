@@ -21,7 +21,7 @@ public class FileStorageService {
 
     public void storeFileInProductFolder(Long productId, MultipartFile file) {
         try {
-            Path uploadDirectory = Paths.get(uploadLocation, productId.toString());
+            Path uploadDirectory = Paths.get(uploadLocation, "products", productId.toString());
             Files.createDirectories(uploadDirectory);
 
             Path fileLocation = uploadDirectory.resolve(Objects.requireNonNull(file.getOriginalFilename()));
@@ -32,7 +32,7 @@ public class FileStorageService {
     }
 
     public void deleteImageFromStorage(Long productId, String fileName) {
-        Path imagePath = Paths.get(uploadLocation, productId.toString(), fileName);
+        Path imagePath = Paths.get(uploadLocation, "products", productId.toString(), fileName);
 
         try {
             Files.deleteIfExists(imagePath);
