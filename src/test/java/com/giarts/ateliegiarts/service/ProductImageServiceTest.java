@@ -52,7 +52,7 @@ public class ProductImageServiceTest {
 
             List<ProductImage> productImages = List.of(
                     createProductImage(1L, "products/1/image_1.png", true, "image_1", productId),
-                    createProductImage(2L, "products/2/image_2.png", false, "image_2", productId)
+                    createProductImage(2L, "products/1/image_2.png", false, "image_2", productId)
             );
 
             doNothing().when(productService).validateProduct(productId);
