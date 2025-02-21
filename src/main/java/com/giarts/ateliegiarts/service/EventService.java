@@ -44,9 +44,12 @@ public class EventService {
     }
 
     public void deleteEventById(Long eventId) {
-        if (eventRepository.existsById(eventId)) {
-            eventRepository.deleteById(eventId);
-        } else {
+        validateEvent(eventId);
+        eventRepository.deleteById(eventId);
+    }
+
+    public void validateEvent(Long eventId) {
+        if (!eventRepository.existsById(eventId)) {
             throw new EventNotFoundException(eventId);
         }
     }
