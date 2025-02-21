@@ -1,5 +1,6 @@
 package com.giarts.ateliegiarts.service;
 
+import com.giarts.ateliegiarts.enums.EImageFolder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ public class FileStorageServiceIntegrationTest {
         String content = "content";
         MultipartFile file = createMockFile(fileName, content);
 
-        fileStorageService.storeFileInProductFolder(productId, file);
+        fileStorageService.storeFileInEntityFolder(EImageFolder.PRODUCT, productId, file);
 
         Path storedFilePath = temporaryDirectory.resolve("products/" + productId.toString() + "/" + fileName);
         assertTrue(Files.exists(storedFilePath));
@@ -55,12 +56,12 @@ public class FileStorageServiceIntegrationTest {
         String content = "content";
         MultipartFile file = createMockFile(fileName, content);
 
-        fileStorageService.storeFileInProductFolder(productId, file);
+        fileStorageService.storeFileInEntityFolder(EImageFolder.PRODUCT, productId, file);
 
         Path storedFilePath = temporaryDirectory.resolve("products/" + productId.toString() + "/" + fileName);
         assertTrue(Files.exists(storedFilePath));
 
-        fileStorageService.deleteImageFromStorage(productId, fileName);
+        fileStorageService.deleteImageFromStorage(EImageFolder.PRODUCT, productId, fileName);
 
         assertFalse(Files.exists(storedFilePath));
     }

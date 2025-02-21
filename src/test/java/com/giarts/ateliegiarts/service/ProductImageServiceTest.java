@@ -1,5 +1,6 @@
 package com.giarts.ateliegiarts.service;
 
+import com.giarts.ateliegiarts.enums.EImageFolder;
 import com.giarts.ateliegiarts.exception.ImageStoreException;
 import com.giarts.ateliegiarts.model.Product;
 import com.giarts.ateliegiarts.model.ProductImage;
@@ -16,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,7 +74,7 @@ public class ProductImageServiceTest {
     class saveUploadedImage {
         @Test
         @DisplayName("Should save uploaded image with success")
-        void shouldSaveUploadedImageWithSuccess() throws IOException {
+        void shouldSaveUploadedImageWithSuccess() {
             Long productId = 1L;
             boolean isMainImage = true;
             String fileName = "image.png";
@@ -93,37 +93,37 @@ public class ProductImageServiceTest {
             MultipartFile file = createMultipartFileMock(fileName, fileSize, contentType);
 
             doNothing().when(productService).validateProduct(anyLong());
-            doNothing().when(fileStorageService).storeFileInProductFolder(anyLong(), any(MultipartFile.class));
+            doNothing().when(fileStorageService).storeFileInEntityFolder(any(EImageFolder.class), anyLong(), any(MultipartFile.class));
             when(productService.getProductById(productId)).thenReturn(createProduct(productId));
             when(productImageRepository.save(productImageArgumentCaptor.capture()))
                     .thenAnswer(invocation -> invocation.getArgument(0));
 
-            productImageService.saveUploadedImage(productId, file, isMainImage);
+            productImageService.saveUploadedProductImage(productId, file, isMainImage);
 
             ProductImage capturedProductImage = productImageArgumentCaptor.getValue();
             assertNotNull(capturedProductImage);
             assertProductImageDetails(expectedProductImage, capturedProductImage);
 
             verify(productService, times(1)).validateProduct(productId);
-            verify(fileStorageService, times(1)).storeFileInProductFolder(productId, file);
+            verify(fileStorageService, times(1)).storeFileInEntityFolder(EImageFolder.PRODUCT, productId, file);
             verify(productImageRepository, times(1)).save(any(ProductImage.class));
         }
 
         @Test
         @DisplayName("Should throw ImageStoreException when file storage fails")
-        void shouldThrowExceptionWhenFileStorageFails() throws IOException {
+        void shouldThrowExceptionWhenFileStorageFails() {
             Long productId = 1L;
             MultipartFile file = createMultipartFileMock("image.png", 1024L, "image/png");
             boolean isMainImage = true;
 
             doNothing().when(productService).validateProduct(anyLong());
             doThrow(new ImageStoreException("Failed to store image for product with id: " + productId))
-                    .when(fileStorageService).storeFileInProductFolder(anyLong(), any(MultipartFile.class));
+                    .when(fileStorageService).storeFileInEntityFolder(any(EImageFolder.class), anyLong(), any(MultipartFile.class));
 
-            assertThrows(ImageStoreException.class, () -> productImageService.saveUploadedImage(productId, file, isMainImage));
+            assertThrows(ImageStoreException.class, () -> productImageService.saveUploadedProductImage(productId, file, isMainImage));
 
             verify(productService, times(1)).validateProduct(anyLong());
-            verify(fileStorageService, times(1)).storeFileInProductFolder(productId, file);
+            verify(fileStorageService, times(1)).storeFileInEntityFolder(EImageFolder.PRODUCT, productId, file);
         }
     }
 
@@ -142,13 +142,13 @@ public class ProductImageServiceTest {
 
             doNothing().when(productService).validateProduct(productId);
             when(productImageRepository.findById(imageId)).thenReturn(Optional.of(productImage));
-            doNothing().when(fileStorageService).deleteImageFromStorage(productId, fileName);
+            doNothing().when(fileStorageService).deleteImageFromStorage(EImageFolder.PRODUCT, productId, fileName);
 
-            assertDoesNotThrow(() -> productImageService.deleteProductImage(productId, imageId));
+            assertDoesNotThrow(() -> productImageService.deleteProductImageById(productId, imageId));
 
             verify(productService, times(1)).validateProduct(productId);
             verify(productImageRepository, times(1)).findById(imageId);
-            verify(fileStorageService, times(1)).deleteImageFromStorage(productId, fileName);
+            verify(fileStorageService, times(1)).deleteImageFromStorage(EImageFolder.PRODUCT, productId, fileName);
             verify(productImageRepository, times(1)).deleteById(imageId);
         }
 
@@ -161,9 +161,9 @@ public class ProductImageServiceTest {
             doNothing().when(productService).validateProduct(productId);
             when(productImageRepository.findById(imageId)).thenReturn(Optional.empty());
 
-            assertThrows(ImageStoreException.class, () -> productImageService.deleteProductImage(productId, imageId));
+            assertThrows(ImageStoreException.class, () -> productImageService.deleteProductImageById(productId, imageId));
 
-            verify(fileStorageService, never()).deleteImageFromStorage(anyLong(), anyString());
+            verify(fileStorageService, never()).deleteImageFromStorage(any(EImageFolder.class), anyLong(), anyString());
             verify(productImageRepository, never()).deleteById(anyLong());
         }
     }

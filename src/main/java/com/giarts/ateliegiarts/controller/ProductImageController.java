@@ -31,10 +31,10 @@ public class ProductImageController {
     @ApiResponse(responseCode = "200", description = "Image uploaded successfully")
     @ApiResponse(responseCode = "404", description = "Product not found")
     @PostMapping
-    public ResponseEntity<ProductImage> uploadImage(@PathVariable("productId") Long productId,
-                                                    @RequestParam("file") MultipartFile file,
-                                                    @RequestParam(value = "isMainImage", defaultValue = "false") Boolean isMainImage) {
-        return ResponseEntity.ok(productImageService.saveUploadedImage(productId, file, isMainImage));
+    public ResponseEntity<ProductImage> uploadProductImage(@PathVariable("productId") Long productId,
+                                                           @RequestParam("file") MultipartFile file,
+                                                           @RequestParam(value = "isMainImage", defaultValue = "false") Boolean isMainImage) {
+        return ResponseEntity.ok(productImageService.saveUploadedProductImage(productId, file, isMainImage));
     }
 
     @Operation(summary = "Delete an image")
@@ -43,7 +43,7 @@ public class ProductImageController {
     @DeleteMapping("/{imageId}")
     public ResponseEntity<Void> deleteProductImageById(@PathVariable("productId") Long productId,
                                                        @PathVariable("imageId") Long imageId) {
-        productImageService.deleteProductImage(productId, imageId);
+        productImageService.deleteProductImageById(productId, imageId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,5 +1,6 @@
 package com.giarts.ateliegiarts.service;
 
+import com.giarts.ateliegiarts.enums.EImageFolder;
 import com.giarts.ateliegiarts.exception.ImageStoreException;
 import com.giarts.ateliegiarts.model.Product;
 import com.giarts.ateliegiarts.model.ProductImage;
@@ -30,10 +31,10 @@ public class ProductImageService {
         return productImageRepository.findAllByProductId(productId);
     }
 
-    public ProductImage saveUploadedImage(Long productId, MultipartFile file, boolean isMainImage) {
+    public ProductImage saveUploadedProductImage(Long productId, MultipartFile file, boolean isMainImage) {
         productService.validateProduct(productId);
 
-        fileStorageService.storeFileInProductFolder(productId, file);
+        fileStorageService.storeFileInEntityFolder(EImageFolder.PRODUCT, productId, file);
 
         String imageUrl = generateImageUrl(productId, file.getOriginalFilename());
 
@@ -56,13 +57,13 @@ public class ProductImageService {
                 .build();
     }
 
-    public void deleteProductImage(Long productId, Long imageId) {
+    public void deleteProductImageById(Long productId, Long imageId) {
         productService.validateProduct(productId);
 
         ProductImage productImage = productImageRepository.findById(imageId)
                 .orElseThrow(() -> new ImageStoreException("Image with id " + imageId + " does not exists"));
 
-        fileStorageService.deleteImageFromStorage(productId, productImage.getFileName());
+        fileStorageService.deleteImageFromStorage(EImageFolder.PRODUCT, productId, productImage.getFileName());
         productImageRepository.deleteById(imageId);
     }
 }

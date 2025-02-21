@@ -1,5 +1,6 @@
 package com.giarts.ateliegiarts.service;
 
+import com.giarts.ateliegiarts.enums.EImageFolder;
 import com.giarts.ateliegiarts.exception.ImageStoreException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,7 +40,7 @@ public class FileStorageServiceUnitTest {
     }
 
     @Nested
-    class storeFileInProductFolder {
+    class storeFileInEntityFolder {
         @Test
         @DisplayName("Should throw ImageStoreException when directory creation fails")
         void shouldThrowExceptionWhenDirectoryCreationFails() {
@@ -48,7 +49,7 @@ public class FileStorageServiceUnitTest {
             try (MockedStatic<Files> mockedFiles = mockStatic(Files.class)) {
                 mockedFiles.when(() -> Files.createDirectories(any(Path.class))).thenThrow(new IOException("Directory creation error"));
 
-                assertThrows(ImageStoreException.class, () -> fileStorageService.storeFileInProductFolder(productId, file));
+                assertThrows(ImageStoreException.class, () -> fileStorageService.storeFileInEntityFolder(EImageFolder.PRODUCT, productId, file));
             }
         }
 
@@ -66,7 +67,7 @@ public class FileStorageServiceUnitTest {
                 mockedFiles.when(() -> Files.copy(any(InputStream.class), any(Path.class), any(StandardCopyOption.class)))
                         .thenThrow(new IOException("File copy error"));
 
-                assertThrows(ImageStoreException.class, () -> fileStorageService.storeFileInProductFolder(productId, file));
+                assertThrows(ImageStoreException.class, () -> fileStorageService.storeFileInEntityFolder(EImageFolder.PRODUCT, productId, file));
             }
         }
     }
@@ -82,7 +83,7 @@ public class FileStorageServiceUnitTest {
             try (MockedStatic<Files> mockedFiles = mockStatic(Files.class)) {
                 mockedFiles.when(() -> Files.deleteIfExists(any(Path.class))).thenThrow(new IOException("File copy error"));
 
-                assertThrows(ImageStoreException.class, () -> fileStorageService.deleteImageFromStorage(productId, fileName));
+                assertThrows(ImageStoreException.class, () -> fileStorageService.deleteImageFromStorage(EImageFolder.PRODUCT, productId, fileName));
             }
         }
     }
