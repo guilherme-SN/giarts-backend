@@ -61,7 +61,6 @@ public class ProductImageServiceTest {
             List<ProductImage> productImagesRetrieved = productImageService.getAllProductImages(productId);
 
             assertNotNull(productImagesRetrieved);
-            assertNotEquals(0, productImagesRetrieved.size());
             assertProductImageDetails(productImages.get(0), productImagesRetrieved.get(0));
             assertProductImageDetails(productImages.get(1), productImagesRetrieved.get(1));
 
