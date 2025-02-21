@@ -183,8 +183,8 @@ public class ProductServiceTest {
         }
 
         @Test
-        @DisplayName("Should throw ProductNotFoundException when product is valid")
-        void ShouldThrowExceptionWhenProductIsValid() {
+        @DisplayName("Should throw ProductNotFoundException when product is invalid")
+        void ShouldThrowExceptionWhenProductIsInvalid() {
             Long productId = 1L;
 
             when(productRepository.existsById(productId)).thenReturn(false);
