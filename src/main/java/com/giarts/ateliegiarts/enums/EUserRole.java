@@ -1,7 +1,6 @@
 package com.giarts.ateliegiarts.enums;
 
 public enum EUserRole {
-    GUEST,
-    CUSTOMER,
-    ADMIN
+    ROLE_CUSTOMER,
+    ROLE_ADMIN
 }

@@ -40,8 +40,8 @@ public class UserServiceTest {
         @DisplayName("Should get all users with success")
         void shouldGetAllUsersWithSuccess() {
             List<User> users = List.of(
-                    createUser(1L, "User 1", "email1@email.com", "password1", EUserRole.GUEST),
-                    createUser(2L, "User 2", "email2@email.com", "password2", EUserRole.ADMIN)
+                    createUser(1L, "User 1", "email1@email.com", "password1", EUserRole.ROLE_CUSTOMER),
+                    createUser(2L, "User 2", "email2@email.com", "password2", EUserRole.ROLE_ADMIN)
             );
 
             when(userRepository.findAll()).thenReturn(users);
@@ -61,7 +61,7 @@ public class UserServiceTest {
         @Test
         @DisplayName("Should get user by ID with success when user exists")
         void shouldGetUserByIdWithSuccessWhenUserExists() {
-            User user = createUser(1L, "User", "email@email.com", "password", EUserRole.GUEST);
+            User user = createUser(1L, "User", "email@email.com", "password", EUserRole.ROLE_CUSTOMER);
 
             when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
@@ -89,8 +89,8 @@ public class UserServiceTest {
         @Test
         @DisplayName("Should create user with success")
         void shouldCreateUserWithSuccess() {
-            UserDTO userDTO = createUserDTO("User", "email@email.com", "password", EUserRole.GUEST);
-            User user = createUser(1L, "User", "email@email.com", "password", EUserRole.GUEST);
+            UserDTO userDTO = createUserDTO("User", "email@email.com", "password", EUserRole.ROLE_CUSTOMER);
+            User user = createUser(1L, "User", "email@email.com", "password", EUserRole.ROLE_CUSTOMER);
 
             when(userRepository.existsByEmail(userDTO.getEmail())).thenReturn(false);
             when(userRepository.save(userArgumentCaptor.capture())).thenReturn(user);
@@ -107,7 +107,7 @@ public class UserServiceTest {
         @Test
         @DisplayName("Should throw DuplicateEmailException when email is already used")
         void shouldThrowExceptionWhenEmailAlreadyUsed() {
-            UserDTO userDTO = createUserDTO("User", "email@email.com", "password", EUserRole.GUEST);
+            UserDTO userDTO = createUserDTO("User", "email@email.com", "password", EUserRole.ROLE_CUSTOMER);
 
             when(userRepository.existsByEmail(anyString())).thenReturn(true);
 
@@ -122,8 +122,8 @@ public class UserServiceTest {
         @Test
         @DisplayName("Should update user with success")
         void shouldUpdateUserWithSuccess() {
-            User user = createUser(1L, "Name", "email@email.com", "password", EUserRole.GUEST);
-            UserDTO updateUserDTO = createUserDTO("Name Updated", "emailupdated@email.com", "password updated", EUserRole.CUSTOMER);
+            User user = createUser(1L, "Name", "email@email.com", "password", EUserRole.ROLE_CUSTOMER);
+            UserDTO updateUserDTO = createUserDTO("Name Updated", "emailupdated@email.com", "password updated", EUserRole.ROLE_CUSTOMER);
 
             when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
             when(userRepository.save(userArgumentCaptor.capture())).thenReturn(user);
@@ -141,7 +141,7 @@ public class UserServiceTest {
         @DisplayName("Should throw UserNotFoundException when user does not exists")
         void shouldThrowExceptionWhenUserDoesNotExists() {
             Long userId = 1L;
-            UserDTO updateUserDTO = createUserDTO("Name Updated", "emailupdated@email.com", "password updated", EUserRole.CUSTOMER);
+            UserDTO updateUserDTO = createUserDTO("Name Updated", "emailupdated@email.com", "password updated", EUserRole.ROLE_CUSTOMER);
 
             when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
