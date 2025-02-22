@@ -6,6 +6,7 @@ import com.giarts.ateliegiarts.exception.UserNotFoundException;
 import com.giarts.ateliegiarts.model.User;
 import com.giarts.ateliegiarts.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -29,7 +31,12 @@ public class UserService {
             throw new DuplicateEmailException(userDTO.getEmail());
         }
 
-        User user = new User(userDTO);
+        User user = User.builder()
+                .name(userDTO.getName())
+                .email(userDTO.getEmail())
+                .password(passwordEncoder.encode(userDTO.getEmail()))
+                .build();
+
         return userRepository.save(user);
     }
 
@@ -45,7 +52,7 @@ public class UserService {
     private void updateUserFields(User user, UserDTO updatedUserDTO) {
         user.setName(updatedUserDTO.getName());
         user.setEmail(updatedUserDTO.getEmail());
-        user.setPassword(updatedUserDTO.getPassword());
+        user.setPassword(passwordEncoder.encode(updatedUserDTO.getPassword()));
     }
 
     public void deleteUserById(Long userId) {

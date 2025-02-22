@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -35,17 +34,6 @@ public class UserController {
     public ResponseEntity<User> getUserById(@PathVariable("userId") Long userId) {
         User user = userService.getUserById(userId);
         return ResponseEntity.ok(user);
-    }
-
-    @Operation(summary = "Create an user")
-    @ApiResponse(responseCode = "201", description = "User created successfully")
-    @ApiResponse(responseCode = "400", description = "Invalid user input")
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody @Valid UserDTO userDTO) {
-        User createdUser = userService.createUser(userDTO);
-
-        URI location = URI.create("/api/users/" + createdUser.getId().toString());
-        return ResponseEntity.created(location).body(createdUser);
     }
 
     @Operation(summary = "Update an user")

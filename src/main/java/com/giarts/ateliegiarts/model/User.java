@@ -1,13 +1,13 @@
 package com.giarts.ateliegiarts.model;
 
 import com.giarts.ateliegiarts.dto.UserDTO;
-import com.giarts.ateliegiarts.enums.EUserRole;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -30,20 +30,17 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private EUserRole userRole;
+    @ManyToMany(fetch =  FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<UserRole> userRoles;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-
-    public User(UserDTO userDTO) {
-        this.name = userDTO.getName();
-        this.email = userDTO.getEmail();
-        this.password = userDTO.getPassword();
-    }
 }
