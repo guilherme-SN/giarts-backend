@@ -45,6 +45,5 @@ public class User {
         this.name = userDTO.getName();
         this.email = userDTO.getEmail();
         this.password = userDTO.getPassword();
-        this.userRole = userDTO.getUserRole();
     }
 }

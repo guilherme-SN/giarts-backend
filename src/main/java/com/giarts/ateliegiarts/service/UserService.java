@@ -46,7 +46,6 @@ public class UserService {
         user.setName(updatedUserDTO.getName());
         user.setEmail(updatedUserDTO.getEmail());
         user.setPassword(updatedUserDTO.getPassword());
-        user.setUserRole(updatedUserDTO.getUserRole());
     }
 
     public void deleteUserById(Long userId) {

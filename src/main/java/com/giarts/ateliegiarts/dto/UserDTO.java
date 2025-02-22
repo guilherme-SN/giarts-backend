@@ -22,7 +22,4 @@ public class UserDTO {
 
     @NotBlank(message = "Password is required")
     private String password;
-
-    @NotNull(message = "UserRole is required")
-    private EUserRole userRole;
 }

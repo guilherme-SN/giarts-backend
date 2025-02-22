@@ -89,7 +89,7 @@ public class UserServiceTest {
         @Test
         @DisplayName("Should create user with success")
         void shouldCreateUserWithSuccess() {
-            UserDTO userDTO = createUserDTO("User", "email@email.com", "password", EUserRole.ROLE_CUSTOMER);
+            UserDTO userDTO = createUserDTO("User", "email@email.com", "password");
             User user = createUser(1L, "User", "email@email.com", "password", EUserRole.ROLE_CUSTOMER);
 
             when(userRepository.existsByEmail(userDTO.getEmail())).thenReturn(false);
@@ -107,7 +107,7 @@ public class UserServiceTest {
         @Test
         @DisplayName("Should throw DuplicateEmailException when email is already used")
         void shouldThrowExceptionWhenEmailAlreadyUsed() {
-            UserDTO userDTO = createUserDTO("User", "email@email.com", "password", EUserRole.ROLE_CUSTOMER);
+            UserDTO userDTO = createUserDTO("User", "email@email.com", "password");
 
             when(userRepository.existsByEmail(anyString())).thenReturn(true);
 
@@ -123,7 +123,7 @@ public class UserServiceTest {
         @DisplayName("Should update user with success")
         void shouldUpdateUserWithSuccess() {
             User user = createUser(1L, "Name", "email@email.com", "password", EUserRole.ROLE_CUSTOMER);
-            UserDTO updateUserDTO = createUserDTO("Name Updated", "emailupdated@email.com", "password updated", EUserRole.ROLE_CUSTOMER);
+            UserDTO updateUserDTO = createUserDTO("Name Updated", "emailupdated@email.com", "password updated");
 
             when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
             when(userRepository.save(userArgumentCaptor.capture())).thenReturn(user);
@@ -141,7 +141,7 @@ public class UserServiceTest {
         @DisplayName("Should throw UserNotFoundException when user does not exists")
         void shouldThrowExceptionWhenUserDoesNotExists() {
             Long userId = 1L;
-            UserDTO updateUserDTO = createUserDTO("Name Updated", "emailupdated@email.com", "password updated", EUserRole.ROLE_CUSTOMER);
+            UserDTO updateUserDTO = createUserDTO("Name Updated", "emailupdated@email.com", "password updated");
 
             when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -184,16 +184,14 @@ public class UserServiceTest {
                 .name(name)
                 .email(email)
                 .password(password)
-                .userRole(userRole)
                 .build();
     }
 
-    private UserDTO createUserDTO(String name, String email, String password, EUserRole userRole) {
+    private UserDTO createUserDTO(String name, String email, String password) {
         return UserDTO.builder()
                 .name(name)
                 .email(email)
                 .password(password)
-                .userRole(userRole)
                 .build();
     }
 
@@ -201,8 +199,7 @@ public class UserServiceTest {
         assertAll(
                 () -> assertEquals(expected.getName(), actual.getName()),
                 () -> assertEquals(expected.getEmail(), actual.getEmail()),
-                () -> assertEquals(expected.getPassword(), actual.getPassword()),
-                () -> assertEquals(expected.getUserRole(), actual.getUserRole())
+                () -> assertEquals(expected.getPassword(), actual.getPassword())
         );
     }
 
@@ -212,7 +209,6 @@ public class UserServiceTest {
                         .name(expected.getName())
                         .email(expected.getEmail())
                         .password(expected.getPassword())
-                        .userRole(expected.getUserRole())
                         .build(),
                 actual);
     }
