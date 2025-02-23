@@ -1,20 +1,24 @@
 package com.giarts.ateliegiarts.service;
 
 import com.giarts.ateliegiarts.dto.UserDTO;
+import com.giarts.ateliegiarts.enums.EUserRole;
 import com.giarts.ateliegiarts.exception.DuplicateEmailException;
 import com.giarts.ateliegiarts.exception.UserNotFoundException;
 import com.giarts.ateliegiarts.model.User;
+import com.giarts.ateliegiarts.model.UserRole;
 import com.giarts.ateliegiarts.repository.UserRepository;
+import com.giarts.ateliegiarts.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
 
     public List<User> getAllUsers() {
@@ -31,13 +35,27 @@ public class UserService {
             throw new DuplicateEmailException(userDTO.getEmail());
         }
 
+        Set<UserRole> userRoles = new HashSet<>();
+        userRoles.add(getOrCreateUserRole(EUserRole.ROLE_CUSTOMER));
+
         User user = User.builder()
                 .name(userDTO.getName())
                 .email(userDTO.getEmail())
-                .password(passwordEncoder.encode(userDTO.getEmail()))
+                .password(passwordEncoder.encode(userDTO.getPassword()))
+                .userRoles(userRoles)
                 .build();
 
         return userRepository.save(user);
+    }
+
+    private UserRole getOrCreateUserRole(EUserRole userRole) {
+        Optional<UserRole> userRoleOptional = userRoleRepository.findByUserRole(userRole);
+        if (userRoleOptional.isPresent()) {
+            return userRoleOptional.get();
+        }
+
+        UserRole newUserRole = UserRole.builder().userRole(userRole).build();
+        return userRoleRepository.save(newUserRole);
     }
 
     public User updateUserById(Long userId, UserDTO updatedUserDTO) {
