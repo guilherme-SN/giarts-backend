@@ -2,7 +2,6 @@ package com.giarts.ateliegiarts.service;
 
 import com.giarts.ateliegiarts.dto.JwtTokenDTO;
 import com.giarts.ateliegiarts.dto.LoginDTO;
-import com.giarts.ateliegiarts.model.User;
 import com.giarts.ateliegiarts.repository.UserRepository;
 import com.giarts.ateliegiarts.security.JwtTokenService;
 import com.giarts.ateliegiarts.security.UserDetailsImpl;
