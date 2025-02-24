@@ -8,7 +8,9 @@ import com.giarts.ateliegiarts.model.User;
 import com.giarts.ateliegiarts.model.UserRole;
 import com.giarts.ateliegiarts.repository.UserRepository;
 import com.giarts.ateliegiarts.repository.UserRoleRepository;
+import com.giarts.ateliegiarts.security.SecurityService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import java.util.*;
 public class UserService {
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
+    private final SecurityService securityService;
     private final PasswordEncoder passwordEncoder;
 
     public List<User> getAllUsers() {
@@ -26,6 +29,8 @@ public class UserService {
     }
 
     public User getUserById(Long userId) {
+        validateUserAccess(userId);
+
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
     }
@@ -59,6 +64,8 @@ public class UserService {
     }
 
     public User updateUserById(Long userId, UserDTO updatedUserDTO) {
+        validateUserAccess(userId);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
@@ -74,10 +81,18 @@ public class UserService {
     }
 
     public void deleteUserById(Long userId) {
+        validateUserAccess(userId);
+
         if (userRepository.existsById(userId)) {
             userRepository.deleteById(userId);
         } else {
             throw new UserNotFoundException(userId);
+        }
+    }
+
+    private void validateUserAccess(Long expectedUserId) {
+        if (!securityService.canAccessUser(expectedUserId)) {
+            throw new AccessDeniedException("Access denied: You can only access your own information");
         }
     }
 }
