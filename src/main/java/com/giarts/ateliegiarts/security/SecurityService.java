@@ -27,7 +27,7 @@ public class SecurityService {
     }
 
     private boolean isAuthenticationValid(Authentication authentication) {
-        return authentication == null || !(authentication.getPrincipal() instanceof UserDetailsImpl);
+        return authentication != null && (authentication.getPrincipal() instanceof UserDetailsImpl);
     }
 
     private boolean isUserAdmin(UserDetailsImpl userDetails) {
