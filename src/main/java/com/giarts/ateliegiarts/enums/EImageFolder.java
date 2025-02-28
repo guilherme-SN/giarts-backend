@@ -1,5 +1,8 @@
 package com.giarts.ateliegiarts.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum EImageFolder {
     PRODUCT("products"),
     EVENT("events");
@@ -8,9 +11,5 @@ public enum EImageFolder {
 
     EImageFolder(String folderName) {
         this.folderName = folderName;
-    }
-
-    public String getFolderName() {
-        return this.folderName;
     }
 }
