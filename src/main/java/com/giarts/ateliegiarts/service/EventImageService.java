@@ -5,6 +5,7 @@ import com.giarts.ateliegiarts.exception.ImageStoreException;
 import com.giarts.ateliegiarts.model.Event;
 import com.giarts.ateliegiarts.model.EventImage;
 import com.giarts.ateliegiarts.repository.EventImageRepository;
+import com.giarts.ateliegiarts.util.ImageUrlGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,6 @@ import java.util.List;
 public class EventImageService {
     @Value("${storage.location}")
     private String uploadLocation;
-
-    @Value("${server.url}")
-    private String serverUrl;
 
     private final EventService eventService;
     private final FileStorageService fileStorageService;
@@ -36,14 +34,10 @@ public class EventImageService {
 
         fileStorageService.storeFileInEntityFolder(EImageFolder.EVENT, eventId, file);
 
-        String imageUrl = generateImageUrl(eventId, file.getOriginalFilename());
+        String imageUrl = ImageUrlGenerator.generateImageUrl(EImageFolder.EVENT, eventId, file.getOriginalFilename());
 
         EventImage eventImage = buildEventImage(eventService.getEventById(eventId), file, imageUrl);
         return eventImageRepository.save(eventImage);
-    }
-
-    private String generateImageUrl(Long eventId, String fileName) {
-        return String.format("%s/events/%d/images/%s", serverUrl, eventId, fileName);
     }
 
     private EventImage buildEventImage(Event event, MultipartFile file, String imageUrl) {

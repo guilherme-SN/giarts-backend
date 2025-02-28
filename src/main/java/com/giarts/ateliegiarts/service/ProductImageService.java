@@ -5,6 +5,7 @@ import com.giarts.ateliegiarts.exception.ImageStoreException;
 import com.giarts.ateliegiarts.model.Product;
 import com.giarts.ateliegiarts.model.ProductImage;
 import com.giarts.ateliegiarts.repository.ProductImageRepository;
+import com.giarts.ateliegiarts.util.ImageUrlGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,6 @@ import java.util.List;
 public class ProductImageService {
     @Value("${storage.location}")
     private String uploadLocation;
-
-    @Value("${server.url}")
-    private String serverUrl;
 
     private final ProductService productService;
     private final FileStorageService fileStorageService;
@@ -36,14 +34,10 @@ public class ProductImageService {
 
         fileStorageService.storeFileInEntityFolder(EImageFolder.PRODUCT, productId, file);
 
-        String imageUrl = generateImageUrl(productId, file.getOriginalFilename());
+        String imageUrl = ImageUrlGenerator.generateImageUrl(EImageFolder.PRODUCT, productId, file.getOriginalFilename());
 
         ProductImage productImage = buildProductImage(productService.getProductById(productId), file, imageUrl, isMainImage);
         return productImageRepository.save(productImage);
-    }
-
-    private String generateImageUrl(Long productId, String fileName) {
-        return String.format("%s/products/%d/images/%s", serverUrl, productId, fileName);
     }
 
     private ProductImage buildProductImage(Product product, MultipartFile file, String imageUrl, boolean isMainImage) {
