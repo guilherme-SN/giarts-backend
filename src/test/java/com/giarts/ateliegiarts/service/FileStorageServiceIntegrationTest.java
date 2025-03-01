@@ -40,30 +40,33 @@ public class FileStorageServiceIntegrationTest {
         Long productId = 1L;
         String fileName = "image.png";
         String content = "content";
-        MultipartFile file = createMockFile(fileName, content);
 
-        fileStorageService.storeFileInEntityFolder(EImageFolder.PRODUCT, productId, file);
+        Path storedFilePath = storeTestFile(EImageFolder.PRODUCT, productId, fileName, content);
 
-        Path storedFilePath = temporaryDirectory.resolve("products/" + productId.toString() + "/" + fileName);
         assertTrue(Files.exists(storedFilePath));
     }
 
     @Test
     @DisplayName("Should delete file with success")
     void shouldDeleteFileWithSuccess() throws IOException {
-        Long productId = 1L;
+        Long eventId = 1L;
         String fileName = "image.png";
         String content = "content";
-        MultipartFile file = createMockFile(fileName, content);
 
-        fileStorageService.storeFileInEntityFolder(EImageFolder.PRODUCT, productId, file);
+        Path storedFilePath = storeTestFile(EImageFolder.EVENT, eventId, fileName, content);
 
-        Path storedFilePath = temporaryDirectory.resolve("products/" + productId.toString() + "/" + fileName);
         assertTrue(Files.exists(storedFilePath));
 
-        fileStorageService.deleteImageFromStorage(EImageFolder.PRODUCT, productId, fileName);
+        fileStorageService.deleteImageFromStorage(EImageFolder.EVENT, eventId, fileName);
 
         assertFalse(Files.exists(storedFilePath));
+    }
+
+    private Path storeTestFile(EImageFolder entityFolder, Long entityId, String fileName, String content) throws IOException {
+        MultipartFile file = createMockFile(fileName, content);
+        fileStorageService.storeFileInEntityFolder(entityFolder, entityId, file);
+
+        return temporaryDirectory.resolve(entityFolder.getFolderName() + "/" + entityId.toString() + "/" + fileName);
     }
 
     private MultipartFile createMockFile(String fileName, String content) throws IOException {
