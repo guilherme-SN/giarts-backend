@@ -2,8 +2,8 @@ package com.giarts.ateliegiarts.controller;
 
 import com.giarts.ateliegiarts.dto.JwtTokenDTO;
 import com.giarts.ateliegiarts.dto.LoginDTO;
-import com.giarts.ateliegiarts.dto.UserDTO;
-import com.giarts.ateliegiarts.model.User;
+import com.giarts.ateliegiarts.dto.user.CreateUserDTO;
+import com.giarts.ateliegiarts.dto.user.ResponseUserDTO;
 import com.giarts.ateliegiarts.service.AuthenticationService;
 import com.giarts.ateliegiarts.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,10 +38,10 @@ public class AuthenticationController {
     @ApiResponse(responseCode = "201", description = "User created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid user input")
     @PostMapping("/register")
-    public ResponseEntity<User> createUser(@RequestBody @Valid UserDTO userDTO) {
-        User createdUser = userService.createUser(userDTO);
+    public ResponseEntity<ResponseUserDTO> createUser(@RequestBody @Valid CreateUserDTO createUserDTO) {
+        ResponseUserDTO response = userService.createUser(createUserDTO);
 
-        URI location = URI.create("/api/users/" + createdUser.getId().toString());
-        return ResponseEntity.created(location).body(createdUser);
+        URI location = URI.create("/api/users/" + response.id().toString());
+        return ResponseEntity.created(location).body(response);
     }
 }

@@ -1,7 +1,7 @@
 package com.giarts.ateliegiarts.controller;
 
-import com.giarts.ateliegiarts.dto.UserDTO;
-import com.giarts.ateliegiarts.model.User;
+import com.giarts.ateliegiarts.dto.user.ResponseUserDTO;
+import com.giarts.ateliegiarts.dto.user.UpdateUserDTO;
 import com.giarts.ateliegiarts.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,7 +23,7 @@ public class UserController {
     @Operation(summary = "List all users")
     @ApiResponse(responseCode = "200", description = "Users retrieved successfully")
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<ResponseUserDTO>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
@@ -31,9 +31,9 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "User retrieved successfully")
     @ApiResponse(responseCode = "404", description = "User not found")
     @GetMapping("/{userId}")
-    public ResponseEntity<User> getUserById(@PathVariable("userId") Long userId) {
-        User user = userService.getUserById(userId);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<ResponseUserDTO> getUserById(@PathVariable("userId") Long userId) {
+        ResponseUserDTO response = userService.getUserById(userId);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Update an user")
@@ -41,9 +41,9 @@ public class UserController {
     @ApiResponse(responseCode = "400", description = "Invalid user input")
     @ApiResponse(responseCode = "404", description = "User not found")
     @PutMapping("/{userId}")
-    public ResponseEntity<User> updateUserById(@PathVariable("userId") Long userId, @RequestBody @Valid UserDTO updatedUserDTO) {
-        User updatedUser = userService.updateUserById(userId, updatedUserDTO);
-        return ResponseEntity.ok(updatedUser);
+    public ResponseEntity<ResponseUserDTO> updateUserById(@PathVariable("userId") Long userId, @RequestBody @Valid UpdateUserDTO updateUserDTO) {
+        ResponseUserDTO response = userService.updateUserById(userId, updateUserDTO);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Delete an user")

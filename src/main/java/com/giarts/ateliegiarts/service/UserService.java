@@ -1,6 +1,8 @@
 package com.giarts.ateliegiarts.service;
 
-import com.giarts.ateliegiarts.dto.UserDTO;
+import com.giarts.ateliegiarts.dto.user.CreateUserDTO;
+import com.giarts.ateliegiarts.dto.user.ResponseUserDTO;
+import com.giarts.ateliegiarts.dto.user.UpdateUserDTO;
 import com.giarts.ateliegiarts.enums.EUserRole;
 import com.giarts.ateliegiarts.exception.DuplicateEmailException;
 import com.giarts.ateliegiarts.exception.UserNotFoundException;
@@ -18,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,33 +30,34 @@ public class UserService {
     private final SecurityService securityService;
     private final PasswordEncoder passwordEncoder;
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<ResponseUserDTO> getAllUsers() {
+        return userRepository.findAll().stream().map(ResponseUserDTO::fromEntity).collect(Collectors.toList());
     }
 
-    public User getUserById(Long userId) {
+    public ResponseUserDTO getUserById(Long userId) {
         validateUserAccess(userId);
 
-        return userRepository.findById(userId)
+        return userRepository.findById(userId).map(ResponseUserDTO::fromEntity)
                 .orElseThrow(() -> new UserNotFoundException(userId));
     }
 
-    public User createUser(UserDTO userDTO) {
-        if (userRepository.existsByEmail(userDTO.getEmail())) {
-            throw new DuplicateEmailException(userDTO.getEmail());
+    public ResponseUserDTO createUser(CreateUserDTO createUserDTO) {
+        if (userRepository.existsByEmail(createUserDTO.email())) {
+            throw new DuplicateEmailException(createUserDTO.email());
         }
 
         Set<UserRole> userRoles = new HashSet<>();
         userRoles.add(getOrCreateUserRole(EUserRole.ROLE_CUSTOMER));
 
         User user = User.builder()
-                .name(userDTO.getName())
-                .email(userDTO.getEmail())
-                .password(passwordEncoder.encode(userDTO.getPassword()))
+                .name(createUserDTO.name())
+                .email(createUserDTO.email())
+                .password(passwordEncoder.encode(createUserDTO.password()))
                 .userRoles(userRoles)
                 .build();
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        return ResponseUserDTO.fromEntity(savedUser);
     }
 
     private UserRole getOrCreateUserRole(EUserRole userRole) {
@@ -66,21 +70,22 @@ public class UserService {
         return userRoleRepository.save(newUserRole);
     }
 
-    public User updateUserById(Long userId, UserDTO updatedUserDTO) {
+    public ResponseUserDTO updateUserById(Long userId, UpdateUserDTO updateUserDTO) {
         validateUserAccess(userId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        updateUserFields(user, updatedUserDTO);
+        updateUserFields(user, updateUserDTO);
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        return ResponseUserDTO.fromEntity(savedUser);
     }
 
-    private void updateUserFields(User user, UserDTO updatedUserDTO) {
-        user.setName(updatedUserDTO.getName());
-        user.setEmail(updatedUserDTO.getEmail());
-        user.setPassword(passwordEncoder.encode(updatedUserDTO.getPassword()));
+    private void updateUserFields(User user, UpdateUserDTO updateUserDTO) {
+        user.setName(updateUserDTO.name());
+        user.setEmail(updateUserDTO.email());
+        user.setPassword(passwordEncoder.encode(updateUserDTO.password()));
     }
 
     public void deleteUserById(Long userId) {
