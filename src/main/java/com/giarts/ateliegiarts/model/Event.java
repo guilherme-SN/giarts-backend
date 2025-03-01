@@ -29,6 +29,12 @@ public class Event {
 
     private String description;
 
+    @Column(nullable = false)
+    private String location;
+
+    @Column(nullable = false)
+    private LocalDateTime dateTime;
+
     @JsonIgnore
     @OneToMany(mappedBy = "event", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<EventImage> eventImages;
@@ -42,5 +48,7 @@ public class Event {
     public Event(EventDTO eventDTO) {
         this.name = eventDTO.getName();
         this.description = eventDTO.getDescription();
+        this.location = eventDTO.getLocation();
+        this.dateTime = eventDTO.getDateTime();
     }
 }

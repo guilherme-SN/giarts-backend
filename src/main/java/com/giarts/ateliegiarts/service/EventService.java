@@ -37,6 +37,8 @@ public class EventService {
 
     private void updateEventFields(Event event, EventDTO updateEventDTO) {
         event.setName(updateEventDTO.getName());
+        event.setLocation(updateEventDTO.getLocation());
+        event.setDateTime(updateEventDTO.getDateTime());
 
         if (updateEventDTO.getDescription() != null) {
             event.setDescription(updateEventDTO.getDescription());
