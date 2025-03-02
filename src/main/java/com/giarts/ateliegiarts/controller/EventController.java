@@ -1,7 +1,8 @@
 package com.giarts.ateliegiarts.controller;
 
-import com.giarts.ateliegiarts.dto.EventDTO;
-import com.giarts.ateliegiarts.model.Event;
+import com.giarts.ateliegiarts.dto.event.CreateEventDTO;
+import com.giarts.ateliegiarts.dto.event.ResponseEventDTO;
+import com.giarts.ateliegiarts.dto.event.UpdateEventDTO;
 import com.giarts.ateliegiarts.service.EventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,7 +25,7 @@ public class EventController {
     @Operation(summary = "List all events")
     @ApiResponse(responseCode = "200", description = "Events retrieved successfully")
     @GetMapping
-    public ResponseEntity<List<Event>> getAllEvents() {
+    public ResponseEntity<List<ResponseEventDTO>> getAllEvents() {
         return ResponseEntity.ok(eventService.getAllEvents());
     }
 
@@ -32,20 +33,20 @@ public class EventController {
     @ApiResponse(responseCode = "200", description = "Event retrieved successfully")
     @ApiResponse(responseCode = "404", description = "Event not found")
     @GetMapping("/{eventId}")
-    public ResponseEntity<Event> getEventById(@PathVariable("eventId") Long eventId) {
-        Event event = eventService.getEventById(eventId);
-        return ResponseEntity.ok(event);
+    public ResponseEntity<ResponseEventDTO> getEventById(@PathVariable("eventId") Long eventId) {
+        ResponseEventDTO response = eventService.getEventById(eventId);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Create an event")
     @ApiResponse(responseCode = "201", description = "Event created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid event input")
     @PostMapping
-    public ResponseEntity<Event> createEvent(@RequestBody @Valid EventDTO eventDTO) {
-        Event createdEvent = eventService.createEvent(eventDTO);
+    public ResponseEntity<ResponseEventDTO> createEvent(@RequestBody @Valid CreateEventDTO createEventDTO) {
+        ResponseEventDTO response = eventService.createEvent(createEventDTO);
 
-        URI location = URI.create("/api/events/" + createdEvent.getId().toString());
-        return ResponseEntity.created(location).body(createdEvent);
+        URI location = URI.create("/api/events/" + response.id().toString());
+        return ResponseEntity.created(location).body(response);
     }
 
     @Operation(summary = "Update an event")
@@ -53,10 +54,10 @@ public class EventController {
     @ApiResponse(responseCode = "400", description = "Invalid event input")
     @ApiResponse(responseCode = "404", description = "Event not found")
     @PutMapping("/{eventId}")
-    public ResponseEntity<Event> updateEventById(@PathVariable("eventId") Long eventId,
-                                                 @RequestBody @Valid EventDTO updateEventDTO) {
-        Event updatedEvent = eventService.updateEventById(eventId, updateEventDTO);
-        return ResponseEntity.ok(updatedEvent);
+    public ResponseEntity<ResponseEventDTO> updateEventById(@PathVariable("eventId") Long eventId,
+                                                            @RequestBody @Valid UpdateEventDTO updateEventDTO) {
+        ResponseEventDTO response = eventService.updateEventById(eventId, updateEventDTO);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Delete an event")

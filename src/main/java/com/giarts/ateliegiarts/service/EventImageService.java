@@ -36,7 +36,7 @@ public class EventImageService {
 
         String imageUrl = ImageUrlGenerator.generateImageUrl(EImageFolder.EVENT, eventId, file.getOriginalFilename());
 
-        EventImage eventImage = buildEventImage(eventService.getEventById(eventId), file, imageUrl);
+        EventImage eventImage = buildEventImage(eventService.getEventEntityById(eventId), file, imageUrl);
         return eventImageRepository.save(eventImage);
     }
 

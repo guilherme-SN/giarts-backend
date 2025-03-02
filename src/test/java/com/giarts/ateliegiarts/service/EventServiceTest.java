@@ -1,6 +1,8 @@
 package com.giarts.ateliegiarts.service;
 
-import com.giarts.ateliegiarts.dto.EventDTO;
+import com.giarts.ateliegiarts.dto.event.CreateEventDTO;
+import com.giarts.ateliegiarts.dto.event.ResponseEventDTO;
+import com.giarts.ateliegiarts.dto.event.UpdateEventDTO;
 import com.giarts.ateliegiarts.exception.EventNotFoundException;
 import com.giarts.ateliegiarts.model.Event;
 import com.giarts.ateliegiarts.repository.EventRepository;
@@ -14,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,13 +40,13 @@ public class EventServiceTest {
         @DisplayName("Should get all events with success")
         void shouldGetAllEventsWithSuccess() {
             List<Event> events = List.of(
-                    createEvent(1L, "Event 1", "Description 1"),
-                    createEvent(2L, "Event 2", "Description 2")
+                    createEvent(1L, "Event 1", "Description 1", "Location 1", LocalDateTime.now()),
+                    createEvent(2L, "Event 2", "Description 2", "Location 2", LocalDateTime.now())
             );
 
             when(eventRepository.findAll()).thenReturn(events);
 
-            List<Event> eventsRetrieved = eventService.getAllEvents();
+            List<ResponseEventDTO> eventsRetrieved = eventService.getAllEvents();
 
             assertNotNull(eventsRetrieved);
             assertEventDetails(events.get(0), eventsRetrieved.get(0));
@@ -58,11 +61,11 @@ public class EventServiceTest {
         @Test
         @DisplayName("Should get an event by ID with success when event exists")
         void shouldGetEventByIdWithSuccessWhenEventExists() {
-            Event event = createEvent(1L, "Name", "Description");
+            Event event = createEvent(1L, "Name", "Description", "Location", LocalDateTime.now());
 
             when(eventRepository.findById(event.getId())).thenReturn(Optional.of(event));
 
-            Event eventRetrieved = eventService.getEventById(event.getId());
+            ResponseEventDTO eventRetrieved = eventService.getEventById(event.getId());
 
             assertNotNull(eventRetrieved);
             assertEventDetails(event, eventRetrieved);
@@ -88,12 +91,13 @@ public class EventServiceTest {
         @Test
         @DisplayName("Should create an event with success")
         void shouldCreateEventWithSuccess() {
-            EventDTO eventDTO = createEventDTO("Name", "Description");
-            Event event = createEvent(1L , "Name", "Description");
+            LocalDateTime dateTime = LocalDateTime.now();
+            CreateEventDTO eventDTO = new CreateEventDTO("Name", "Description", "Location", dateTime);
+            Event event = createEvent(1L , "Name", "Description", "Location", dateTime);
 
             when(eventRepository.save(eventArgumentCaptor.capture())).thenReturn(event);
 
-            Event createdEvent = eventService.createEvent(eventDTO);
+            ResponseEventDTO createdEvent = eventService.createEvent(eventDTO);
 
             assertNotNull(createdEvent);
             assertEventDetails(event, createdEvent);
@@ -107,13 +111,13 @@ public class EventServiceTest {
         @Test
         @DisplayName("Should update event with success")
         void shouldUpdateEventWithSuccess() {
-            Event event = createEvent(1L, "Name", "Description");
-            EventDTO updateEventDTO = createEventDTO("Name Updated", "Description Updated");
+            Event event = createEvent(1L, "Name", "Description", "Location", LocalDateTime.now());
+            UpdateEventDTO updateEventDTO = new UpdateEventDTO("Name Updated", "Description Updated", "Location", LocalDateTime.now());
 
             when(eventRepository.findById(event.getId())).thenReturn(Optional.of(event));
             when(eventRepository.save(eventArgumentCaptor.capture())).thenReturn(event);
 
-            Event updatedEvent = eventService.updateEventById(event.getId(), updateEventDTO);
+            ResponseEventDTO updatedEvent = eventService.updateEventById(event.getId(), updateEventDTO);
 
             assertNotNull(updatedEvent);
             assertEventDetails(updateEventDTO, updatedEvent);
@@ -126,7 +130,8 @@ public class EventServiceTest {
         @DisplayName("Should throw EventNotFoundException when event does not exists")
         void shouldThrowExceptionWhenEventDoesNotExists() {
             Long eventId = 1L;
-            EventDTO updateEventDTO = createEventDTO("Name updated", "Description Updated");
+            UpdateEventDTO updateEventDTO = new UpdateEventDTO("Name updated", "Description Updated",
+                    "Location", LocalDateTime.now());
 
             when(eventRepository.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -192,35 +197,34 @@ public class EventServiceTest {
         }
     }
 
-    private Event createEvent(Long id, String name, String description) {
+    private Event createEvent(Long id, String name, String description, String location, LocalDateTime dateTime) {
         return Event.builder()
                 .id(id)
                 .name(name)
                 .description(description)
+                .location(location)
+                .dateTime(dateTime)
                 .build();
     }
 
-    private EventDTO createEventDTO(String name, String description) {
-        return EventDTO.builder()
-                .name(name)
-                .description(description)
-                .build();
-    }
-
-    private void assertEventDetails(EventDTO expected, Event actual) {
+    private void assertEventDetails(UpdateEventDTO expected, ResponseEventDTO actual) {
         assertEventDetails(
                 Event.builder()
-                        .name(expected.getName())
-                        .description(expected.getDescription())
+                        .name(expected.name())
+                        .description(expected.description())
+                        .location(expected.location())
+                        .dateTime(expected.dateTime())
                         .build(),
                 actual
         );
     }
 
-    private void assertEventDetails(Event expected, Event actual) {
+    private void assertEventDetails(Event expected, ResponseEventDTO actual) {
         assertAll(
-                () -> assertEquals(expected.getName(), actual.getName()),
-                () -> assertEquals(expected.getDescription(), actual.getDescription())
+                () -> assertEquals(expected.getName(), actual.name()),
+                () -> assertEquals(expected.getDescription(), actual.description()),
+                () -> assertEquals(expected.getLocation(), actual.location()),
+                () -> assertEquals(expected.getDateTime(), actual.dateTime())
         );
     }
 }

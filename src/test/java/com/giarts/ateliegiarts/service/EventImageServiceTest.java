@@ -86,7 +86,7 @@ public class EventImageServiceTest {
 
             doNothing().when(eventService).validateEvent(eventId);
             doNothing().when(fileStorageService).storeFileInEntityFolder(any(EImageFolder.class), anyLong(), any(MultipartFile.class));
-            when(eventService.getEventById(eventId)).thenReturn(createEvent(eventId));
+            when(eventService.getEventEntityById(eventId)).thenReturn(createEvent(eventId));
             when(eventImageRepository.save(eventImageArgumentCaptor.capture()))
                     .thenAnswer(invocation -> invocation.getArgument(0));
 

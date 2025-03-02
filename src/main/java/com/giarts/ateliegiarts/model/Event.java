@@ -1,7 +1,7 @@
 package com.giarts.ateliegiarts.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.giarts.ateliegiarts.dto.EventDTO;
+import com.giarts.ateliegiarts.dto.event.CreateEventDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,10 +45,10 @@ public class Event {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public Event(EventDTO eventDTO) {
-        this.name = eventDTO.getName();
-        this.description = eventDTO.getDescription();
-        this.location = eventDTO.getLocation();
-        this.dateTime = eventDTO.getDateTime();
+    public Event(CreateEventDTO createEventDTO) {
+        this.name = createEventDTO.name();
+        this.description = createEventDTO.description();
+        this.location = createEventDTO.location();
+        this.dateTime = createEventDTO.dateTime();
     }
 }
