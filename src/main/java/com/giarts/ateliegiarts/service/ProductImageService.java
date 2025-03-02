@@ -36,7 +36,7 @@ public class ProductImageService {
 
         String imageUrl = ImageUrlGenerator.generateImageUrl(EImageFolder.PRODUCT, productId, file.getOriginalFilename());
 
-        ProductImage productImage = buildProductImage(productService.getProductById(productId), file, imageUrl, isMainImage);
+        ProductImage productImage = buildProductImage(productService.getProductEntityById(productId), file, imageUrl, isMainImage);
         return productImageRepository.save(productImage);
     }
 

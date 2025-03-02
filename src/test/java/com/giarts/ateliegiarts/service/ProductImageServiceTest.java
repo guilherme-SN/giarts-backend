@@ -93,7 +93,7 @@ public class ProductImageServiceTest {
 
             doNothing().when(productService).validateProduct(anyLong());
             doNothing().when(fileStorageService).storeFileInEntityFolder(any(EImageFolder.class), anyLong(), any(MultipartFile.class));
-            when(productService.getProductById(productId)).thenReturn(createProduct(productId));
+            when(productService.getProductEntityById(productId)).thenReturn(createProduct(productId));
             when(productImageRepository.save(productImageArgumentCaptor.capture()))
                     .thenAnswer(invocation -> invocation.getArgument(0));
 

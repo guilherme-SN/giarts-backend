@@ -1,7 +1,8 @@
 package com.giarts.ateliegiarts.controller;
 
-import com.giarts.ateliegiarts.dto.ProductDTO;
-import com.giarts.ateliegiarts.model.Product;
+import com.giarts.ateliegiarts.dto.product.CreateProductDTO;
+import com.giarts.ateliegiarts.dto.product.ResponseProductDTO;
+import com.giarts.ateliegiarts.dto.product.UpdateProductDTO;
 import com.giarts.ateliegiarts.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,7 +25,7 @@ public class ProductController {
     @Operation(summary = "List all products")
     @ApiResponse(responseCode = "200", description = "Products retrieved successfully")
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
+    public ResponseEntity<List<ResponseProductDTO>> getAllProducts() {
         return ResponseEntity.ok(productService.getAllProducts());
     }
 
@@ -32,20 +33,20 @@ public class ProductController {
     @ApiResponse(responseCode = "200", description = "Product retrieved successfully")
     @ApiResponse(responseCode = "404", description = "Product not found")
     @GetMapping("/{productId}")
-    public ResponseEntity<Product> getProductById(@PathVariable("productId") Long productId) {
-        Product product = productService.getProductById(productId);
-        return ResponseEntity.ok(product);
+    public ResponseEntity<ResponseProductDTO> getProductById(@PathVariable("productId") Long productId) {
+        ResponseProductDTO response = productService.getProductById(productId);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Create a product")
     @ApiResponse(responseCode = "201", description = "Product created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid product input")
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody @Valid ProductDTO productDTO) {
-        Product createdProduct = productService.createProduct(productDTO);
+    public ResponseEntity<ResponseProductDTO> createProduct(@RequestBody @Valid CreateProductDTO createProductDTO) {
+        ResponseProductDTO response = productService.createProduct(createProductDTO);
 
-        URI location = URI.create("/api/products/" + createdProduct.getId().toString());
-        return ResponseEntity.created(location).body(createdProduct);
+        URI location = URI.create("/api/products/" + response.id().toString());
+        return ResponseEntity.created(location).body(response);
     }
 
     @Operation(summary = "Update a product")
@@ -53,10 +54,10 @@ public class ProductController {
     @ApiResponse(responseCode = "400", description = "Invalid product input")
     @ApiResponse(responseCode = "404", description = "Product not found")
     @PutMapping("/{productId}")
-    public ResponseEntity<Product> updateProductById(@PathVariable("productId") Long productId,
-                                                     @RequestBody @Valid ProductDTO updateProductDTO) {
-        Product updatedProduct = productService.updateProductById(productId, updateProductDTO);
-        return ResponseEntity.ok(updatedProduct);
+    public ResponseEntity<ResponseProductDTO> updateProductById(@PathVariable("productId") Long productId,
+                                                     @RequestBody @Valid UpdateProductDTO updateProductDTO) {
+        ResponseProductDTO response = productService.updateProductById(productId, updateProductDTO);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Delete a product")

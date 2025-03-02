@@ -1,6 +1,8 @@
 package com.giarts.ateliegiarts.service;
 
-import com.giarts.ateliegiarts.dto.ProductDTO;
+import com.giarts.ateliegiarts.dto.product.CreateProductDTO;
+import com.giarts.ateliegiarts.dto.product.ResponseProductDTO;
+import com.giarts.ateliegiarts.dto.product.UpdateProductDTO;
 import com.giarts.ateliegiarts.exception.ProductNotFoundException;
 import com.giarts.ateliegiarts.model.Product;
 import com.giarts.ateliegiarts.repository.ProductRepository;
@@ -8,39 +10,48 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
 
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<ResponseProductDTO> getAllProducts() {
+        return productRepository.findAll().stream().map(ResponseProductDTO::fromEntity).collect(Collectors.toList());
     }
 
-    public Product getProductById(Long productId) {
+    public Product getProductEntityById(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
     }
 
-    public Product createProduct(ProductDTO productDTO) {
-        Product product = new Product(productDTO);
-        return productRepository.save(product);
+    public ResponseProductDTO getProductById(Long productId) {
+        return productRepository.findById(productId).map(ResponseProductDTO::fromEntity)
+                .orElseThrow(() -> new ProductNotFoundException(productId));
     }
 
-    public Product updateProductById(Long productId, ProductDTO updateProductDTO) {
+    public ResponseProductDTO createProduct(CreateProductDTO createProductDTO) {
+        Product product = new Product(createProductDTO);
+        Product savedProduct = productRepository.save(product);
+
+        return ResponseProductDTO.fromEntity(savedProduct);
+    }
+
+    public ResponseProductDTO updateProductById(Long productId, UpdateProductDTO updateProductDTO) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
 
         updateProductFields(product, updateProductDTO);
 
-        return productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+        return ResponseProductDTO.fromEntity(savedProduct);
     }
 
-    private void updateProductFields(Product product, ProductDTO updateProductDTO) {
-        product.setName(updateProductDTO.getName());
-        product.setDescription(updateProductDTO.getDescription());
-        product.setProductType(updateProductDTO.getProductType());
+    private void updateProductFields(Product product, UpdateProductDTO updateProductDTO) {
+        product.setName(updateProductDTO.name());
+        product.setDescription(updateProductDTO.description());
+        product.setProductType(updateProductDTO.productType());
 
     }
 

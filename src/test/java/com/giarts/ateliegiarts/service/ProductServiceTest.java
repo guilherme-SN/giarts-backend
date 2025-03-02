@@ -1,6 +1,8 @@
 package com.giarts.ateliegiarts.service;
 
-import com.giarts.ateliegiarts.dto.ProductDTO;
+import com.giarts.ateliegiarts.dto.product.CreateProductDTO;
+import com.giarts.ateliegiarts.dto.product.ResponseProductDTO;
+import com.giarts.ateliegiarts.dto.product.UpdateProductDTO;
 import com.giarts.ateliegiarts.enums.EProductType;
 import com.giarts.ateliegiarts.exception.ProductNotFoundException;
 import com.giarts.ateliegiarts.model.Product;
@@ -44,7 +46,7 @@ public class ProductServiceTest {
 
             when(productRepository.findAll()).thenReturn(products);
 
-            List<Product> productsRetrieved = productService.getAllProducts();
+            List<ResponseProductDTO> productsRetrieved = productService.getAllProducts();
 
             assertNotNull(productsRetrieved);
             assertProductDetails(products.get(0), productsRetrieved.get(0));
@@ -63,7 +65,7 @@ public class ProductServiceTest {
 
             when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
 
-            Product productRetrieved = productService.getProductById(product.getId());
+            ResponseProductDTO productRetrieved = productService.getProductById(product.getId());
 
             assertNotNull(productRetrieved);
             assertProductDetails(product, productRetrieved);
@@ -89,12 +91,12 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Should create product with success")
         void shouldCreateProductWithSuccess() {
-            ProductDTO productDTO = createProductDTO("product", "description", EProductType.BOLSA);
+            CreateProductDTO productDTO = new CreateProductDTO("product", "description", EProductType.BOLSA);
             Product product = createProduct(1L, "product", "description", EProductType.BOLSA);
 
             when(productRepository.save(productArgumentCaptor.capture())).thenReturn(product);
 
-            Product createdProduct = productService.createProduct(productDTO);
+            ResponseProductDTO createdProduct = productService.createProduct(productDTO);
 
             assertNotNull(createdProduct);
             assertProductDetails(product, createdProduct);
@@ -109,13 +111,13 @@ public class ProductServiceTest {
         @DisplayName("Should update product with success")
         void shouldUpdateProductWithSuccess() {
             Product product = createProduct(1L, "product", "description", EProductType.BOLSA);
-            ProductDTO updateProductDTO = createProductDTO("product updated", "description updated",
+            UpdateProductDTO updateProductDTO = new UpdateProductDTO("product updated", "description updated",
                     EProductType.BOLSA);
 
             when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
             when(productRepository.save(productArgumentCaptor.capture())).thenReturn(product);
 
-            Product updatedProduct = productService.updateProductById(product.getId(), updateProductDTO);
+            ResponseProductDTO updatedProduct = productService.updateProductById(product.getId(), updateProductDTO);
 
             assertNotNull(updatedProduct);
             assertProductDetails(updateProductDTO, updatedProduct);
@@ -128,7 +130,7 @@ public class ProductServiceTest {
         @DisplayName("Should throw ProductNotFoundException when product does not exists")
         void shouldThrowExceptionWhenProductDoesNotExists() {
             Long productId = 1L;
-            ProductDTO updateProductDTO = createProductDTO("product updated", "description updated",
+            UpdateProductDTO updateProductDTO = new UpdateProductDTO("product updated", "description updated",
                     EProductType.BOLSA);
 
             when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -204,28 +206,20 @@ public class ProductServiceTest {
                 .build();
     }
 
-    private ProductDTO createProductDTO(String name, String description, EProductType productType) {
-        return ProductDTO.builder()
-                .name(name)
-                .description(description)
-                .productType(productType)
-                .build();
-    }
-
-    private void assertProductDetails(Product expected, Product actual) {
+    private void assertProductDetails(Product expected, ResponseProductDTO actual) {
         assertAll(
-                () -> assertEquals(expected.getName(), actual.getName()),
-                () -> assertEquals(expected.getDescription(), actual.getDescription()),
-                () -> assertEquals(expected.getProductType(), actual.getProductType())
+                () -> assertEquals(expected.getName(), actual.name()),
+                () -> assertEquals(expected.getDescription(), actual.description()),
+                () -> assertEquals(expected.getProductType(), actual.productType())
         );
     }
 
-    private void assertProductDetails(ProductDTO expected, Product actual) {
+    private void assertProductDetails(UpdateProductDTO expected, ResponseProductDTO actual) {
         assertProductDetails(
                 Product.builder()
-                        .name(expected.getName())
-                        .description(expected.getDescription())
-                        .productType(expected.getProductType())
+                        .name(expected.name())
+                        .description(expected.description())
+                        .productType(expected.productType())
                         .build(),
                 actual
         );

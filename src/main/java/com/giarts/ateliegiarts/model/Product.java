@@ -1,7 +1,7 @@
 package com.giarts.ateliegiarts.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.giarts.ateliegiarts.dto.ProductDTO;
+import com.giarts.ateliegiarts.dto.product.CreateProductDTO;
 import com.giarts.ateliegiarts.enums.EProductType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -43,9 +43,9 @@ public class Product {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public Product(ProductDTO productDTO) {
-        this.name = productDTO.getName();
-        this.description = productDTO.getDescription();
-        this.productType = productDTO.getProductType();
+    public Product(CreateProductDTO createProductDTO) {
+        this.name = createProductDTO.name();
+        this.description = createProductDTO.description();
+        this.productType = createProductDTO.productType();
     }
 }
