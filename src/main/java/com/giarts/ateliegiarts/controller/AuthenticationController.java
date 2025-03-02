@@ -1,7 +1,7 @@
 package com.giarts.ateliegiarts.controller;
 
-import com.giarts.ateliegiarts.dto.JwtTokenDTO;
-import com.giarts.ateliegiarts.dto.LoginDTO;
+import com.giarts.ateliegiarts.dto.authentication.JwtTokenResponseDTO;
+import com.giarts.ateliegiarts.dto.authentication.LoginRequestDTO;
 import com.giarts.ateliegiarts.dto.user.CreateUserDTO;
 import com.giarts.ateliegiarts.dto.user.ResponseUserDTO;
 import com.giarts.ateliegiarts.service.AuthenticationService;
@@ -30,7 +30,7 @@ public class AuthenticationController {
     @Operation(summary = "Get JWT token")
     @ApiResponse(responseCode = "200", description = "JWT token retrieved successfully")
     @PostMapping("/login")
-    public ResponseEntity<JwtTokenDTO> login(@RequestBody @Valid LoginDTO loginDTO) {
+    public ResponseEntity<JwtTokenResponseDTO> login(@RequestBody @Valid LoginRequestDTO loginDTO) {
         return ResponseEntity.ok(authenticationService.authenticateUser(loginDTO));
     }
 
