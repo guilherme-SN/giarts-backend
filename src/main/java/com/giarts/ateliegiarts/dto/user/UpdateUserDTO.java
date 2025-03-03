@@ -1,7 +1,11 @@
 package com.giarts.ateliegiarts.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.giarts.ateliegiarts.model.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+
+import java.util.Set;
 
 public record UpdateUserDTO(
         @NotBlank(message = "Name is required")
@@ -12,6 +16,9 @@ public record UpdateUserDTO(
         String email,
 
         @NotBlank(message = "Password is required")
-        String password
+        String password,
+
+        @JsonIgnore
+        Set<UserRole> userRoles
 ) {
 }

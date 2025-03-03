@@ -23,8 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -148,7 +147,8 @@ public class UserServiceTest {
         @DisplayName("Should update user with success")
         void shouldUpdateUserWithSuccess() {
             User user = createUser(1L, "Name", "email@email.com", "encrypted password", EUserRole.ROLE_CUSTOMER);
-            UpdateUserDTO updateUserDTO = new UpdateUserDTO("Name Updated", "emailupdated@email.com", "password updated");
+            UpdateUserDTO updateUserDTO = new UpdateUserDTO("Name Updated", "emailupdated@email.com",
+                    "password updated", Set.of(new UserRole(1L, EUserRole.ROLE_CUSTOMER)));
 
             when(securityService.canAccessUser(anyLong())).thenReturn(true);
             when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
@@ -170,7 +170,8 @@ public class UserServiceTest {
         @DisplayName("Should throw UserNotFoundException when user does not exists")
         void shouldThrowExceptionWhenUserDoesNotExists() {
             Long userId = 1L;
-            UpdateUserDTO updateUserDTO = new UpdateUserDTO("Name Updated", "emailupdated@email.com", "password updated");
+            UpdateUserDTO updateUserDTO = new UpdateUserDTO("Name Updated", "emailupdated@email.com",
+                    "password updated", Set.of());
 
             when(securityService.canAccessUser(anyLong())).thenReturn(true);
             when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -217,6 +218,7 @@ public class UserServiceTest {
                 .name(name)
                 .email(email)
                 .password(password)
+                .userRoles(Set.of(new UserRole(1L, userRole)))
                 .build();
     }
 
@@ -224,7 +226,8 @@ public class UserServiceTest {
         assertAll(
                 () -> assertEquals(expected.getName(), actual.name()),
                 () -> assertEquals(expected.getEmail(), actual.email()),
-                () -> assertEquals(expected.getPassword(), actual.password())
+                () -> assertEquals(expected.getPassword(), actual.password()),
+                () -> assertUserRoles(expected.getUserRoles(), actual.userRoles())
         );
     }
 
@@ -234,7 +237,14 @@ public class UserServiceTest {
                         .name(expected.name())
                         .email(expected.email())
                         .password(expected.password())
+                        .userRoles(expected.userRoles())
                         .build(),
                 actual);
+    }
+
+    private void assertUserRoles(Set<UserRole> expected, Set<UserRole> actual) {
+        for (UserRole expectedUserRole : expected) {
+            assertTrue(actual.contains(expectedUserRole));
+        }
     }
 }

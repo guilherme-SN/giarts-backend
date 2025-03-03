@@ -11,7 +11,7 @@ public record ResponseUserDTO(
         String name,
         String email,
         String password,
-        Set<UserRole>userRoles,
+        Set<UserRole> userRoles,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
