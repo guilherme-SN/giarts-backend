@@ -8,6 +8,7 @@ import com.giarts.ateliegiarts.repository.ProductImageRepository;
 import com.giarts.ateliegiarts.service.FileStorageService;
 import com.giarts.ateliegiarts.service.ProductImageService;
 import com.giarts.ateliegiarts.service.ProductService;
+import com.giarts.ateliegiarts.utils.MultipartFileTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -92,7 +93,7 @@ public class ProductImageServiceTest {
                     productId
             );
 
-            MultipartFile file = createMultipartFileMock(fileName, fileSize, contentType);
+            MultipartFile file = MultipartFileTestUtils.createMultipartFileMock(fileName, fileSize, contentType);
 
             doNothing().when(productService).validateProduct(anyLong());
             doNothing().when(fileStorageService).storeFileInEntityFolder(any(EImageFolder.class), anyLong(), any(MultipartFile.class));
@@ -115,7 +116,7 @@ public class ProductImageServiceTest {
         @DisplayName("Should throw ImageStoreException when file storage fails")
         void shouldThrowExceptionWhenFileStorageFails() {
             Long productId = 1L;
-            MultipartFile file = createMultipartFileMock("image.png", 1024L, "image/png");
+            MultipartFile file = MultipartFileTestUtils.createMultipartFileMock("image.png", 1024L, "image/png");
             boolean isMainImage = true;
 
             doNothing().when(productService).validateProduct(anyLong());
@@ -185,15 +186,6 @@ public class ProductImageServiceTest {
 
     private Product createProduct(Long productId) {
         return Product.builder().id(productId).build();
-    }
-
-    private MultipartFile createMultipartFileMock(String fileName, Long fileSize, String contentType) {
-        MultipartFile file = mock(MultipartFile.class);
-        lenient().when(file.getOriginalFilename()).thenReturn(fileName);
-        lenient().when(file.getSize()).thenReturn(fileSize);
-        lenient().when(file.getContentType()).thenReturn(contentType);
-
-        return file;
     }
 
     private void assertProductImageDetails(ProductImage expected, ProductImage actual) {

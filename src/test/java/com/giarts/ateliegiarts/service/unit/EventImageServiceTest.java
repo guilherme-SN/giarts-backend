@@ -8,6 +8,7 @@ import com.giarts.ateliegiarts.repository.EventImageRepository;
 import com.giarts.ateliegiarts.service.EventImageService;
 import com.giarts.ateliegiarts.service.EventService;
 import com.giarts.ateliegiarts.service.FileStorageService;
+import com.giarts.ateliegiarts.utils.MultipartFileTestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -83,7 +84,7 @@ public class EventImageServiceTest {
             String contentType = "image/png";
             String expectedImageUrl = String.format("%s/events/%d/images/%s", serverUrl, eventId, fileName);
 
-            MultipartFile file = createMultipartFileMock(fileName, fileSize, contentType);
+            MultipartFile file = MultipartFileTestUtils.createMultipartFileMock(fileName, fileSize, contentType);
 
             EventImage expectedEventImage = createEventImage(1L, expectedImageUrl, fileName, eventId);
 
@@ -108,7 +109,7 @@ public class EventImageServiceTest {
         @DisplayName("Should throw ImageStoreException when file storage fails")
         void shouldThrowExceptionWhenFileStorageFails() {
             Long eventId = 1L;
-            MultipartFile file = createMultipartFileMock("image.png", 1024L, "image/png");
+            MultipartFile file = MultipartFileTestUtils.createMultipartFileMock("image.png", 1024L, "image/png");
 
             doNothing().when(eventService).validateEvent(eventId);
             doThrow(new ImageStoreException("Failed to store image for event with id: " + eventId))
@@ -176,16 +177,6 @@ public class EventImageServiceTest {
 
     private Event createEvent(Long eventId) {
         return Event.builder().id(eventId).build();
-    }
-
-    private MultipartFile createMultipartFileMock(String fileName, Long fileSize, String contentType) {
-        MultipartFile file = mock(MultipartFile.class);
-
-        lenient().when(file.getOriginalFilename()).thenReturn(fileName);
-        lenient().when(file.getSize()).thenReturn(fileSize);
-        lenient().when(file.getContentType()).thenReturn(contentType);
-
-        return file;
     }
 
     private void assertEventImageDetails(EventImage expected, EventImage actual) {
