@@ -16,6 +16,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class EventImageService {
+    @Value("${server.url}")
+    private String serverUrl;
+
     @Value("${storage.location}")
     private String uploadLocation;
 
@@ -34,7 +37,7 @@ public class EventImageService {
 
         fileStorageService.storeFileInEntityFolder(EImageFolder.EVENT, eventId, file);
 
-        String imageUrl = ImageUrlGenerator.generateImageUrl(EImageFolder.EVENT, eventId, file.getOriginalFilename());
+        String imageUrl = ImageUrlGenerator.generateImageUrl(serverUrl, EImageFolder.EVENT, eventId, file.getOriginalFilename());
 
         EventImage eventImage = buildEventImage(eventService.getEventEntityById(eventId), file, imageUrl);
         return eventImageRepository.save(eventImage);

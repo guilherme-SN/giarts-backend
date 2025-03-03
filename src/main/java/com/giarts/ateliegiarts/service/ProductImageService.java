@@ -16,6 +16,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ProductImageService {
+    @Value("${server.url}")
+    private String serverUrl;
+
     @Value("${storage.location}")
     private String uploadLocation;
 
@@ -34,7 +37,7 @@ public class ProductImageService {
 
         fileStorageService.storeFileInEntityFolder(EImageFolder.PRODUCT, productId, file);
 
-        String imageUrl = ImageUrlGenerator.generateImageUrl(EImageFolder.PRODUCT, productId, file.getOriginalFilename());
+        String imageUrl = ImageUrlGenerator.generateImageUrl(serverUrl, EImageFolder.PRODUCT, productId, file.getOriginalFilename());
 
         ProductImage productImage = buildProductImage(productService.getProductEntityById(productId), file, imageUrl, isMainImage);
         return productImageRepository.save(productImage);
