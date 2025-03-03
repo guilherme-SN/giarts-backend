@@ -1,6 +1,7 @@
-package com.giarts.ateliegiarts.service;
+package com.giarts.ateliegiarts.service.integration;
 
 import com.giarts.ateliegiarts.enums.EImageFolder;
+import com.giarts.ateliegiarts.service.FileStorageService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

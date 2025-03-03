@@ -1,4 +1,4 @@
-package com.giarts.ateliegiarts.service;
+package com.giarts.ateliegiarts.service.unit;
 
 import com.giarts.ateliegiarts.dto.event.CreateEventDTO;
 import com.giarts.ateliegiarts.dto.event.ResponseEventDTO;
@@ -6,6 +6,7 @@ import com.giarts.ateliegiarts.dto.event.UpdateEventDTO;
 import com.giarts.ateliegiarts.exception.EventNotFoundException;
 import com.giarts.ateliegiarts.model.Event;
 import com.giarts.ateliegiarts.repository.EventRepository;
+import com.giarts.ateliegiarts.service.EventService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

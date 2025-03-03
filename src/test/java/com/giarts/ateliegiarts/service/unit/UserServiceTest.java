@@ -1,4 +1,4 @@
-package com.giarts.ateliegiarts.service;
+package com.giarts.ateliegiarts.service.unit;
 
 import com.giarts.ateliegiarts.dto.user.CreateUserDTO;
 import com.giarts.ateliegiarts.dto.user.ResponseUserDTO;
@@ -11,6 +11,7 @@ import com.giarts.ateliegiarts.model.UserRole;
 import com.giarts.ateliegiarts.repository.UserRepository;
 import com.giarts.ateliegiarts.repository.UserRoleRepository;
 import com.giarts.ateliegiarts.security.SecurityService;
+import com.giarts.ateliegiarts.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,8 @@
-package com.giarts.ateliegiarts.service;
+package com.giarts.ateliegiarts.service.unit;
 
 import com.giarts.ateliegiarts.enums.EImageFolder;
 import com.giarts.ateliegiarts.exception.ImageStoreException;
+import com.giarts.ateliegiarts.service.FileStorageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,7 +28,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class FileStorageServiceUnitTest {
+public class FileStorageServiceTest {
     @Mock
     private MultipartFile file;
 

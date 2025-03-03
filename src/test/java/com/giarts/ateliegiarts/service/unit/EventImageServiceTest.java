@@ -1,10 +1,13 @@
-package com.giarts.ateliegiarts.service;
+package com.giarts.ateliegiarts.service.unit;
 
 import com.giarts.ateliegiarts.enums.EImageFolder;
 import com.giarts.ateliegiarts.exception.ImageStoreException;
 import com.giarts.ateliegiarts.model.Event;
 import com.giarts.ateliegiarts.model.EventImage;
 import com.giarts.ateliegiarts.repository.EventImageRepository;
+import com.giarts.ateliegiarts.service.EventImageService;
+import com.giarts.ateliegiarts.service.EventService;
+import com.giarts.ateliegiarts.service.FileStorageService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

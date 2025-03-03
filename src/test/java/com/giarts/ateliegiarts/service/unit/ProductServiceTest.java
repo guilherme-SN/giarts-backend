@@ -1,4 +1,4 @@
-package com.giarts.ateliegiarts.service;
+package com.giarts.ateliegiarts.service.unit;
 
 import com.giarts.ateliegiarts.dto.product.CreateProductDTO;
 import com.giarts.ateliegiarts.dto.product.ResponseProductDTO;
@@ -7,6 +7,7 @@ import com.giarts.ateliegiarts.enums.EProductType;
 import com.giarts.ateliegiarts.exception.ProductNotFoundException;
 import com.giarts.ateliegiarts.model.Product;
 import com.giarts.ateliegiarts.repository.ProductRepository;
+import com.giarts.ateliegiarts.service.ProductService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
