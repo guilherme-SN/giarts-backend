@@ -6,6 +6,7 @@ import com.giarts.ateliegiarts.model.UserRole;
 import com.giarts.ateliegiarts.repository.UserRepository;
 import com.giarts.ateliegiarts.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -18,6 +19,7 @@ import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class AdminInitializer {
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
@@ -31,8 +33,11 @@ public class AdminInitializer {
 
     @EventListener(ApplicationReadyEvent.class)
     public void createFirstAdminUser() {
+        log.info("Creating the first admin user");
+
         Optional<User> optionalUser = userRepository.findByEmail(adminEmail);
         if (optionalUser.isPresent()) {
+            log.warn("Email \"{}\" already in use", optionalUser.get().getEmail());
             return;
         }
 
@@ -47,6 +52,7 @@ public class AdminInitializer {
                 .build();
 
         userRepository.save(user);
+        log.debug("User admin created");
     }
 
     private UserRole getOrCreateUserRole(EUserRole userRole) {

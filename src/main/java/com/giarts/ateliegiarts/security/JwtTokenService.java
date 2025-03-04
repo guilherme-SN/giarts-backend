@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @Service
+@Slf4j
 public class JwtTokenService {
     private static final String ISSUER = "giarts-api";
 
@@ -20,14 +22,21 @@ public class JwtTokenService {
 
     public String generateToken(UserDetailsImpl user) {
         try {
+            log.info("Generating token for user: {}", user.getUsername());
+
             Algorithm algorithm = Algorithm.HMAC256(secretKey);
-            return JWT.create()
+            String token = JWT.create()
                     .withIssuer(ISSUER)
                     .withIssuedAt(generateCreationDate())
                     .withExpiresAt(generateExpirationDate())
                     .withSubject(user.getUsername())
                     .sign(algorithm);
+
+            log.debug("Token successfully generated for user: {}", user.getUsername());
+
+            return token;
         } catch (JWTCreationException ex) {
+            log.error("Error while generating token for user: {}", user.getUsername(), ex);
             throw new JWTCreationException("Error while generating token", ex);
         }
     }
@@ -42,13 +51,20 @@ public class JwtTokenService {
 
     public String getSubjectFromToken(String token) {
         try {
+            log.info("Retrieving subject from token");
+
             Algorithm algorithm = Algorithm.HMAC256(secretKey);
-            return JWT.require(algorithm)
+            String subject = JWT.require(algorithm)
                     .withIssuer(ISSUER)
                     .build()
                     .verify(token)
                     .getSubject();
+
+            log.debug("Subject retrieved successfully from token");
+
+            return subject;
         } catch (JWTVerificationException ex) {
+            log.error("Token verification failed for user. Token might be invalid or expired", ex);
             throw new JWTVerificationException("Invalid or expired token", ex);
         }
     }
