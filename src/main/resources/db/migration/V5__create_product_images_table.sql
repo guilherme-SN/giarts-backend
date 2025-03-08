@@ -1,0 +1,13 @@
+CREATE TABLE product_images (
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+	image_url VARCHAR(255) NOT NULL,
+	is_main_image BIT(1) NOT NULL,
+	file_name VARCHAR(255) DEFAULT NULL,
+	file_size BIGINT DEFAULT NULL,
+	file_type VARCHAR(255) DEFAULT NULL,
+	product_id BIGINT NOT NULL,
+	created_at DATETIME DEFAULT NULL,
+	updated_at DATETIME DEFAULT NULL,
+
+	CONSTRAINT fk_product_id FOREIGN KEY (product_id) REFERENCES products(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
