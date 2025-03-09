@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,11 +24,11 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
 
-    @Operation(summary = "List all products")
+    @Operation(summary = "List all products with pagination")
     @ApiResponse(responseCode = "200", description = "Products retrieved successfully")
     @GetMapping
-    public ResponseEntity<List<ResponseProductDTO>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+    public ResponseEntity<Page<ResponseProductDTO>> getAllProducts(Pageable pageable) {
+        return ResponseEntity.ok(productService.getAllProducts(pageable));
     }
 
     @Operation(summary = "Get a product by ID")

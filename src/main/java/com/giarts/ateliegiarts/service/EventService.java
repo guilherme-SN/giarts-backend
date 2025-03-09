@@ -8,9 +8,9 @@ import com.giarts.ateliegiarts.model.Event;
 import com.giarts.ateliegiarts.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,12 +18,12 @@ import java.util.List;
 public class EventService {
     private final EventRepository eventRepository;
 
-    public List<ResponseEventDTO> getAllEvents() {
-        log.info("Retrieving all events");
+    public Page<ResponseEventDTO> getAllEvents(Pageable pageable) {
+        log.info("Retrieving all events from page: {} with size: {}", pageable.getPageNumber(), pageable.getPageSize());
 
-        List<ResponseEventDTO> events = eventRepository.findAll().stream().map(ResponseEventDTO::fromEntity).toList();
+        Page<ResponseEventDTO> events = eventRepository.findAllEventsPaginated(pageable).map(ResponseEventDTO::fromEntity);
 
-        log.debug("Found {} events", events.size());
+        log.debug("Found {} events in page: {}", events.getNumberOfElements(), pageable.getPageNumber());
 
         return events;
     }

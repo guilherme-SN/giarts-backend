@@ -17,6 +17,10 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,20 +44,24 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Should get all products with success")
         void shouldGetAllProductsWithSuccess() {
-            List<Product> products = List.of(
+            Pageable pageable = PageRequest.of(0, 100);
+
+            List<Product> productsList = List.of(
                     createProduct(1L, "product 1", "description 1", EProductType.BOLSA),
                     createProduct(2L, "product 2", "description 2", EProductType.TAPETE)
             );
 
-            when(productRepository.findAll()).thenReturn(products);
+            Page<Product> productsPage = new PageImpl<>(productsList, pageable, productsList.size());
 
-            List<ResponseProductDTO> productsRetrieved = productService.getAllProducts();
+            when(productRepository.findAllProductsPaginated(pageable)).thenReturn(productsPage);
+
+            List<ResponseProductDTO> productsRetrieved = productService.getAllProducts(pageable).getContent();
 
             assertNotNull(productsRetrieved);
-            assertProductDetails(products.get(0), productsRetrieved.get(0));
-            assertProductDetails(products.get(1), productsRetrieved.get(1));
+            assertProductDetails(productsList.get(0), productsRetrieved.get(0));
+            assertProductDetails(productsList.get(1), productsRetrieved.get(1));
 
-            verify(productRepository, times(1)).findAll();
+            verify(productRepository, times(1)).findAllProductsPaginated(pageable);
         }
     }
 

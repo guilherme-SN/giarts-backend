@@ -16,6 +16,10 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,20 +44,24 @@ public class EventServiceTest {
         @Test
         @DisplayName("Should get all events with success")
         void shouldGetAllEventsWithSuccess() {
-            List<Event> events = List.of(
+            Pageable pageable = PageRequest.of(0, 100);
+
+            List<Event> eventsList = List.of(
                     createEvent(1L, "Event 1", "Description 1", "Location 1", LocalDateTime.now()),
                     createEvent(2L, "Event 2", "Description 2", "Location 2", LocalDateTime.now())
             );
 
-            when(eventRepository.findAll()).thenReturn(events);
+            Page<Event> eventsPage = new PageImpl<>(eventsList, pageable, eventsList.size());
 
-            List<ResponseEventDTO> eventsRetrieved = eventService.getAllEvents();
+            when(eventRepository.findAllEventsPaginated(pageable)).thenReturn(eventsPage);
+
+            List<ResponseEventDTO> eventsRetrieved = eventService.getAllEvents(pageable).getContent();
 
             assertNotNull(eventsRetrieved);
-            assertEventDetails(events.get(0), eventsRetrieved.get(0));
-            assertEventDetails(events.get(1), eventsRetrieved.get(1));
+            assertEventDetails(eventsList.get(0), eventsRetrieved.get(0));
+            assertEventDetails(eventsList.get(1), eventsRetrieved.get(1));
 
-            verify(eventRepository, times(1)).findAll();
+            verify(eventRepository, times(1)).findAllEventsPaginated(pageable);
         }
     }
 

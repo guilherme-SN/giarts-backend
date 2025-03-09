@@ -9,11 +9,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/events")
@@ -22,11 +23,11 @@ import java.util.List;
 public class EventController {
     private final EventService eventService;
 
-    @Operation(summary = "List all events")
+    @Operation(summary = "List all events with pagination")
     @ApiResponse(responseCode = "200", description = "Events retrieved successfully")
     @GetMapping
-    public ResponseEntity<List<ResponseEventDTO>> getAllEvents() {
-        return ResponseEntity.ok(eventService.getAllEvents());
+    public ResponseEntity<Page<ResponseEventDTO>> getAllEvents(Pageable pageable) {
+        return ResponseEntity.ok(eventService.getAllEvents(pageable));
     }
 
     @Operation(summary = "Get an event by ID")

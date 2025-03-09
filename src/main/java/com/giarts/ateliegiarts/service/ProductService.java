@@ -8,6 +8,8 @@ import com.giarts.ateliegiarts.model.Product;
 import com.giarts.ateliegiarts.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,12 +20,12 @@ import java.util.List;
 public class ProductService {
     private final ProductRepository productRepository;
 
-    public List<ResponseProductDTO> getAllProducts() {
-        log.info("Retrieving all products");
+    public Page<ResponseProductDTO> getAllProducts(Pageable pageable) {
+        log.info("Retrieving all products from page: {} with size: {}", pageable.getPageNumber(), pageable.getPageSize());
 
-        List<ResponseProductDTO> products = productRepository.findAll().stream().map(ResponseProductDTO::fromEntity).toList();
+        Page<ResponseProductDTO> products = productRepository.findAllProductsPaginated(pageable).map(ResponseProductDTO::fromEntity);
 
-        log.debug("Found {} products", products.size());
+        log.debug("Found {} products in page: {}", products.getNumberOfElements(), pageable.getPageNumber());
 
         return products;
     }
